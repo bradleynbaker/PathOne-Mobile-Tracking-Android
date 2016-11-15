@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">PathOne Tracking</string>
+    <string name="title_activity_home">HomeActivity</string>
 </resources>
