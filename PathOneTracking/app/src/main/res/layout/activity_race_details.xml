@@ -11,8 +11,7 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="one.path.pathonetracking.RaceDetailsActivity">
 
-
-    <ToggleButton
+    <!-- ToggleButton
         android:text="ToggleButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -21,7 +20,7 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignParentEnd="true" / -->
 
     <fragment
         android:id="@+id/map"
@@ -32,8 +31,7 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/imageView"
-        android:layout_above="@+id/toggleButton" />
+        android:layout_below="@+id/imageView"/>
 
     <ImageView
         android:layout_width="wrap_content"

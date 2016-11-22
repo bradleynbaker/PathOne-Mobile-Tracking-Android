@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -41,14 +43,6 @@ public class RaceDetailsActivity extends AppCompatActivity implements OnMapReady
         // Getting GoogleMap object from the fragment
         mapFragment.getMapAsync(this);
         int a = 1;
-
-        /*
-
-
-
-
-        */
-
 
     }
 
@@ -140,4 +134,37 @@ public class RaceDetailsActivity extends AppCompatActivity implements OnMapReady
     public void onProviderDisabled(String provider) {
 
     }
+
+
+    /** BEGIN MENU **/
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_showSettings) {
+            // Intent intent=new  Intent(getApplicationContext(),ChangePassword.class);
+            // startActivity(intent);
+            return true;
+        }
+
+        /*else if(id==R.id.nav_gallery){ // }else if(id==R.id.action_logout){
+            finish();
+        }*/
+
+
+        // return true;
+        return super.onOptionsItemSelected(item);
+    }
+    /** END MENU **/
 }
