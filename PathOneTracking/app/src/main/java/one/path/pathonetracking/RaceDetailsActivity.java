@@ -1,11 +1,14 @@
 package one.path.pathonetracking;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -43,6 +46,10 @@ public class RaceDetailsActivity extends AppCompatActivity implements OnMapReady
         // Getting GoogleMap object from the fragment
         mapFragment.getMapAsync(this);
         int a = 1;
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean locationEnabled = prefs.getBoolean("location_enabled_switch", false);
+
 
     }
 
@@ -153,8 +160,8 @@ public class RaceDetailsActivity extends AppCompatActivity implements OnMapReady
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_showSettings) {
-            // Intent intent=new  Intent(getApplicationContext(),ChangePassword.class);
-            // startActivity(intent);
+            Intent settingsIntent=new  Intent(getApplicationContext(),SettingsActivity.class);
+            startActivity(settingsIntent);
             return true;
         }
 
