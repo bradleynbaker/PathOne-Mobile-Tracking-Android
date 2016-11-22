@@ -1,4 +1,4 @@
-package one.path.pathonetracking.one.path.pathonetracking.database;
+package one.path.pathonetracking.database;
 
 import java.io.File;
 import java.io.FileOutputStream;

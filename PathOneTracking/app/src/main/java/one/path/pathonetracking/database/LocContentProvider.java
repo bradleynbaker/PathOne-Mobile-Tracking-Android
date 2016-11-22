@@ -1,4 +1,4 @@
-package one.path.pathonetracking.one.path.pathonetracking.database;
+package one.path.pathonetracking.database;
 
 import java.util.Arrays;
 import java.util.HashSet;
