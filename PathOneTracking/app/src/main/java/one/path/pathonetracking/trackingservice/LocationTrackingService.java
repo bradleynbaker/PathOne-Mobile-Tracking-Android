@@ -1,6 +1,7 @@
 package one.path.pathonetracking.trackingservice;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
@@ -92,7 +93,7 @@ public class LocationTrackingService extends Service implements
         // Within {@code onPause()}, we pause location updates, but leave the
         // connection to GoogleApiClient intact.  Here, we resume receiving
         // location updates if the user has requested them.
-        Log.d("LOC", "Service init...");
+        // Log.d("LOC", "Service init...");
         isEnded = false;
         mRequestingLocationUpdates = false;
         mLastUpdateTime = "";
@@ -113,7 +114,7 @@ public class LocationTrackingService extends Service implements
     public void onConnectionSuspended(int i) {
         // The connection to Google Play services was lost for some reason. We call connect() to
         // attempt to re-establish the connection.
-        Log.i(TAG, "Connection suspended==");
+        // Log.i(TAG, "Connection suspended==");
         mGoogleApiClient.connect();
     }
 
@@ -130,14 +131,14 @@ public class LocationTrackingService extends Service implements
 
         // lets see how many records we have stored
         ArrayList<LocationVo> locations = LocationDBHelper.getInstance(this).getAllLocationLatLongDetails();
-        Log.i(TAG, "*** RECORD COUNT: " + locations.size());
+        // Log.i(TAG, "*** RECORD COUNT: " + locations.size());
     }
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
         // Refer to the javadoc for ConnectionResult to see what error codes might be returned in
         // onConnectionFailed.
-        Log.i(TAG, "Connection failed: ConnectionResult.getErrorCode() = " + connectionResult.getErrorCode());
+        // Log.i(TAG, "Connection failed: ConnectionResult.getErrorCode() = " + connectionResult.getErrorCode());
     }
 
     /**
@@ -145,7 +146,7 @@ public class LocationTrackingService extends Service implements
      * LocationServices API.
      */
     protected synchronized void buildGoogleApiClient() {
-        Log.i(TAG, "Building GoogleApiClient===");
+        // Log.i(TAG, "Building GoogleApiClient===");
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
@@ -179,14 +180,38 @@ public class LocationTrackingService extends Service implements
                 ());
         */
 
-        LocationDBHelper.getInstance(this).insertLocationDetails(mLocationData);
+        class DBHelperTask implements Runnable {
+            Context ctx;
+            DBHelperTask(Context ctx) { ctx = ctx; }
+                public void run() {
+                    LocationDBHelper.getInstance(ctx).insertLocationDetails(mLocationData);
+                }
+        }
+        Thread t = new Thread(new DBHelperTask(this));
+        t.start();
+
+
+        // LocationDBHelper.getInstance(this).insertLocationDetails(mLocationData);
 
 
         // broadcast location
-        String locartion  = mCurrentLocation.getLatitude() + ", " + mCurrentLocation.getLongitude();
+        /* String locartion  = mCurrentLocation.getLatitude() + ", " + mCurrentLocation.getLongitude();
         Intent RTReturn = new Intent(RaceDetailsActivity.PATHONE_TRACKING_SERVICE_CURRENT_POSITION_JSON);
         RTReturn.putExtra("location", locartion);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(RTReturn);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(RTReturn); */
+
+        class BroadcastLocationTask implements Runnable {
+            Context ctx;
+            BroadcastLocationTask(Context ctx) { ctx = ctx; }
+            public void run() {
+                String locartion  = mCurrentLocation.getLatitude() + ", " + mCurrentLocation.getLongitude();
+                Intent RTReturn = new Intent(RaceDetailsActivity.PATHONE_TRACKING_SERVICE_CURRENT_POSITION_JSON);
+                RTReturn.putExtra("location", locartion);
+                LocalBroadcastManager.getInstance(ctx).sendBroadcast(RTReturn);
+            }
+        }
+        Thread broadcast = new Thread(new BroadcastLocationTask(this));
+        broadcast.start();
 
     }
 
@@ -237,7 +262,7 @@ public class LocationTrackingService extends Service implements
                 Log.e(TAG, ex.toString());
             }
 
-            Log.i(TAG, " startLocationUpdates===");
+            // Log.i(TAG, " startLocationUpdates===");
             isEnded = true;
         }
     }
@@ -252,7 +277,7 @@ public class LocationTrackingService extends Service implements
             // stopped state. Doing so helps battery performance and is especially
             // recommended in applications that request frequent location updates.
 
-            Log.d(TAG, "stopLocationUpdates();==");
+            // Log.d(TAG, "stopLocationUpdates();==");
             // The final argument to {@code requestLocationUpdates()} is a LocationListener
             // (http://developer.android.com/reference/com/google/android/gms/location/LocationListener.html).
             LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
