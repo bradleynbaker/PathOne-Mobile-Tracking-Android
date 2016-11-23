@@ -8,7 +8,6 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -20,7 +19,7 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-import one.path.pathonetracking.R;
+import one.path.pathonetracking.RaceDetailsActivity;
 
 public class LocationTrackingService extends Service implements
         LocationListener,
@@ -76,7 +75,8 @@ public class LocationTrackingService extends Service implements
         // Kick off the process of building a GoogleApiClient and requesting the LocationServices
         // API.
 
-        LocalBroadcastManager broadcaster = LocalBroadcastManager.getInstance(this);
+        // LocalBroadcastManager broadcaster = LocalBroadcastManager.getInstance(this);
+
 
     }
 
@@ -122,9 +122,11 @@ public class LocationTrackingService extends Service implements
         mCurrentLocation = location;
         mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
         updateUI();
+
+        /*
         Toast.makeText(this, getResources().getString(R.string.location_updated_message),
                 Toast.LENGTH_SHORT).show();
-
+        */
 
         // lets see how many records we have stored
         ArrayList<LocationVo> locations = LocationDBHelper.getInstance(this).getAllLocationLatLongDetails();
@@ -169,12 +171,23 @@ public class LocationTrackingService extends Service implements
      */
     private void updateUI() {
         setLocationData();
+
+        /*
         Toast.makeText(this, "Latitude: =" + mCurrentLocation.getLatitude() + " Longitude:=" + mCurrentLocation
                 .getLongitude(), Toast.LENGTH_SHORT).show();
         Log.d(TAG, "Latitude:==" + mCurrentLocation.getLatitude() + "\n Longitude:==" + mCurrentLocation.getLongitude
                 ());
+        */
 
         LocationDBHelper.getInstance(this).insertLocationDetails(mLocationData);
+
+
+        // broadcast location
+        String locartion  = mCurrentLocation.getLatitude() + ", " + mCurrentLocation.getLongitude();
+        Intent RTReturn = new Intent(RaceDetailsActivity.PATHONE_TRACKING_SERVICE_CURRENT_POSITION_JSON);
+        RTReturn.putExtra("location", locartion);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(RTReturn);
+
     }
 
 
