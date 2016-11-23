@@ -6,6 +6,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -74,6 +75,9 @@ public class LocationTrackingService extends Service implements
         super.onCreate();
         // Kick off the process of building a GoogleApiClient and requesting the LocationServices
         // API.
+
+        LocalBroadcastManager broadcaster = LocalBroadcastManager.getInstance(this);
+
     }
 
     @Nullable

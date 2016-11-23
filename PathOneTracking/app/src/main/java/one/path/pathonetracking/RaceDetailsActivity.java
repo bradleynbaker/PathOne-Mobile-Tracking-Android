@@ -19,7 +19,7 @@ public class RaceDetailsActivity extends Activity{
     }
 
 
-    
+
 
     public void onToggleClicked(View view) {
         boolean on = ((ToggleButton) view).isChecked();
