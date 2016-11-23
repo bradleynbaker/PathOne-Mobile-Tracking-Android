@@ -35,9 +35,10 @@
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyCZ7ui3TERjOYxBjEGl8h3NwAaZtXDpch8" />
 
-        <activity
-            android:name=".SettingsActivity"
-            android:label="@string/title_activity_settings"></activity>
+        <service
+            android:name=".trackingservice.LocationTrackingService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>
