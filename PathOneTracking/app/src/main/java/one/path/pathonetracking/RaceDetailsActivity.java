@@ -66,7 +66,7 @@ public class RaceDetailsActivity extends AppCompatActivity implements OnMapReady
         String strDeviceId = Settings.Secure.getString(this.getContentResolver(),
                 Settings.Secure.ANDROID_ID);
 
-        DEVICE_ID = (new BigInteger(strDeviceId, 16)).intValue();
+        DEVICE_ID = Math.abs((new BigInteger(strDeviceId, 16)).intValue());
         EditText deviceIdText = (EditText) findViewById(R.id.deviceId);
         deviceIdText.setText("ID " + DEVICE_ID);
     }
