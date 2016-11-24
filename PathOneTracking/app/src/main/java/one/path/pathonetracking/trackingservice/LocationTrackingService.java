@@ -130,7 +130,7 @@ public class LocationTrackingService extends Service implements
         */
 
         // lets see how many records we have stored
-        ArrayList<LocationVo> locations = LocationDBHelper.getInstance(this).getAllLocationLatLongDetails();
+        // ArrayList<LocationVo> locations = LocationDBHelper.getInstance(this).getAllLocationLatLongDetails();
         // Log.i(TAG, "*** RECORD COUNT: " + locations.size());
     }
 
@@ -181,10 +181,16 @@ public class LocationTrackingService extends Service implements
         */
 
         class DBHelperTask implements Runnable {
-            Context ctx;
-            DBHelperTask(Context ctx) { ctx = ctx; }
+            Context theContext;
+            DBHelperTask(Context ctx) { theContext = ctx; }
                 public void run() {
-                    LocationDBHelper.getInstance(ctx).insertLocationDetails(mLocationData);
+                    Log.i("** CONTEX **", theContext.toString());
+                    LocationDBHelper helper = LocationDBHelper.getInstance(theContext);
+                    // LocationDBHelper.getInstance(ctx).insertLocationDetails(mLocationData);
+                    // ArrayList<LocationVo> locations = LocationDBHelper.getInstance(ctx).getAllLocationLatLongDetails();
+                    helper.insertLocationDetails(mLocationData);
+                    ArrayList<LocationVo> locations = helper.getAllLocationLatLongDetails();
+                    Log.i("DATABASE",  String.valueOf(locations.size()));
                 }
         }
         Thread t = new Thread(new DBHelperTask(this));
@@ -201,17 +207,22 @@ public class LocationTrackingService extends Service implements
         LocalBroadcastManager.getInstance(this).sendBroadcast(RTReturn); */
 
         class BroadcastLocationTask implements Runnable {
-            Context ctx;
-            BroadcastLocationTask(Context ctx) { ctx = ctx; }
+            Context theContext;
+            BroadcastLocationTask(Context ctx) { theContext = ctx; }
             public void run() {
+                Log.i("** CONTEX **", theContext.toString());
                 String locartion  = mCurrentLocation.getLatitude() + ", " + mCurrentLocation.getLongitude();
                 Intent RTReturn = new Intent(RaceDetailsActivity.PATHONE_TRACKING_SERVICE_CURRENT_POSITION_JSON);
                 RTReturn.putExtra("location", locartion);
-                LocalBroadcastManager.getInstance(ctx).sendBroadcast(RTReturn);
+                // RTReturn.putExtra("locationCount", locations.size());
+                LocalBroadcastManager.getInstance(theContext).sendBroadcast(RTReturn);
             }
         }
         Thread broadcast = new Thread(new BroadcastLocationTask(this));
         broadcast.start();
+
+
+
 
     }
 
@@ -256,7 +267,7 @@ public class LocationTrackingService extends Service implements
             // The final argument to {@code requestLocationUpdates()} is a LocationListener
             // (http://developer.android.com/reference/com/google/android/gms/location/LocationListener.html).
             try {
-                LocationServices.FusedLocationApi.requestLocationUpdates(
+                if(mGoogleApiClient.isConnected()) LocationServices.FusedLocationApi.requestLocationUpdates(
                         mGoogleApiClient, mLocationRequest, this);
             }catch(SecurityException ex){
                 Log.e(TAG, ex.toString());

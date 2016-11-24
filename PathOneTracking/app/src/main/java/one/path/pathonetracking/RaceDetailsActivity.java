@@ -93,10 +93,15 @@ public class RaceDetailsActivity extends AppCompatActivity implements OnMapReady
         public void onReceive(Context context, Intent intent) {
             if(intent.getAction().equals(PATHONE_TRACKING_SERVICE_CURRENT_POSITION_JSON)) {
                 String location = intent.getStringExtra("location");
+                String locationCount = intent.getStringExtra("locationCount");
 
                 // update location on screen
                 EditText locationText = (EditText) findViewById(R.id.coords);
                 locationText.setText("Coords: " + location);
+
+                // update record count
+                EditText locationCountText = (EditText) findViewById(R.id.editText3);
+                locationCountText.setText("Saved Locations " + locationCount);
 
                 // update map
                 String[] parts = location.split(",");
