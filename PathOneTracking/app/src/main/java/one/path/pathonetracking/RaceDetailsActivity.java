@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -56,6 +57,12 @@ public class RaceDetailsActivity extends AppCompatActivity implements OnMapReady
         // Getting GoogleMap object from the fragment
         mapFragment.getMapAsync(this);
 
+        // display device id
+        String deviceId = "ID " + Settings.Secure.getString(this.getContentResolver(),
+                Settings.Secure.ANDROID_ID);
+
+        EditText deviceIdText = (EditText) findViewById(R.id.deviceId);
+        deviceIdText.setText("ID " + deviceId);
     }
 
 

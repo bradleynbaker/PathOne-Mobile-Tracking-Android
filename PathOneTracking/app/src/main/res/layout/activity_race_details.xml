@@ -21,7 +21,7 @@
             android:layout_alignParentEnd="true"
             android:layout_marginBottom="34dp"
             android:layout_weight="0.86"
-        android:layout_below="@+id/editText3" />
+        android:layout_below="@+id/deviceId" />
 
 
 
@@ -61,14 +61,26 @@
         android:layout_alignParentStart="true" />
 
     <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="textPersonName"
-            android:text="Saved Locations"
-            android:ems="10"
-            android:id="@+id/editText3"
-            android:enabled="false"
-        android:layout_below="@+id/coords"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:inputType="textPersonName"
+    android:text="Saved Locations"
+    android:ems="10"
+    android:id="@+id/editText3"
+    android:enabled="false"
+    android:layout_below="@+id/coords"
+    android:layout_alignParentLeft="true"
+    android:layout_alignParentStart="true" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textPersonName"
+        android:text="ID "
+        android:ems="10"
+        android:id="@+id/deviceId"
+        android:enabled="false"
+        android:layout_below="@+id/editText3"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 

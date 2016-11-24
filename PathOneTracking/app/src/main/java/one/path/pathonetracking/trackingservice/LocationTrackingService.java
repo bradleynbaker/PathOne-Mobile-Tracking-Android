@@ -184,13 +184,10 @@ public class LocationTrackingService extends Service implements
             Context theContext;
             DBHelperTask(Context ctx) { theContext = ctx; }
                 public void run() {
-                    Log.i("** CONTEX **", theContext.toString());
                     LocationDBHelper helper = LocationDBHelper.getInstance(theContext);
                     // LocationDBHelper.getInstance(ctx).insertLocationDetails(mLocationData);
                     // ArrayList<LocationVo> locations = LocationDBHelper.getInstance(ctx).getAllLocationLatLongDetails();
                     helper.insertLocationDetails(mLocationData);
-                    ArrayList<LocationVo> locations = helper.getAllLocationLatLongDetails();
-                    Log.i("DATABASE",  String.valueOf(locations.size()));
                 }
         }
         Thread t = new Thread(new DBHelperTask(this));
@@ -210,11 +207,10 @@ public class LocationTrackingService extends Service implements
             Context theContext;
             BroadcastLocationTask(Context ctx) { theContext = ctx; }
             public void run() {
-                Log.i("** CONTEX **", theContext.toString());
                 String locartion  = mCurrentLocation.getLatitude() + ", " + mCurrentLocation.getLongitude();
                 Intent RTReturn = new Intent(RaceDetailsActivity.PATHONE_TRACKING_SERVICE_CURRENT_POSITION_JSON);
                 RTReturn.putExtra("location", locartion);
-                // RTReturn.putExtra("locationCount", locations.size());
+                RTReturn.putExtra("locationCount", String.valueOf((LocationDBHelper.getInstance(theContext).getAllLocationLatLongDetails()).size()));
                 LocalBroadcastManager.getInstance(theContext).sendBroadcast(RTReturn);
             }
         }
@@ -222,7 +218,23 @@ public class LocationTrackingService extends Service implements
         broadcast.start();
 
 
-
+        /*
+        * {"provider":"fused","time":1478979485999,"latitude":28.6733794,"longitude":-82.1500887,"accuracy":4,"speed":0,"altitude":-10.115875120621,"bearing":96,"locationProvider":1}
+        *
+        * */
+        class HttpPostTask implements Runnable {
+            Context theContext;
+            HttpPostTask(Context ctx) { theContext = ctx; }
+            public void run() {
+                String locartion  = mCurrentLocation.getLatitude() + ", " + mCurrentLocation.getLongitude();
+                Intent RTReturn = new Intent(RaceDetailsActivity.PATHONE_TRACKING_SERVICE_CURRENT_POSITION_JSON);
+                RTReturn.putExtra("location", locartion);
+                RTReturn.putExtra("locationCount", String.valueOf((LocationDBHelper.getInstance(theContext).getAllLocationLatLongDetails()).size()));
+                LocalBroadcastManager.getInstance(theContext).sendBroadcast(RTReturn);
+            }
+        }
+        Thread httpPost = new Thread(new HttpPostTask(this));
+        httpPost.start();
 
     }
 
