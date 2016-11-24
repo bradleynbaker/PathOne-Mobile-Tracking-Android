@@ -16,6 +16,13 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.BasicResponseHandler;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONObject;
+
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -226,11 +233,53 @@ public class LocationTrackingService extends Service implements
             Context theContext;
             HttpPostTask(Context ctx) { theContext = ctx; }
             public void run() {
-                String locartion  = mCurrentLocation.getLatitude() + ", " + mCurrentLocation.getLongitude();
-                Intent RTReturn = new Intent(RaceDetailsActivity.PATHONE_TRACKING_SERVICE_CURRENT_POSITION_JSON);
-                RTReturn.putExtra("location", locartion);
-                RTReturn.putExtra("locationCount", String.valueOf((LocationDBHelper.getInstance(theContext).getAllLocationLatLongDetails()).size()));
-                LocalBroadcastManager.getInstance(theContext).sendBroadcast(RTReturn);
+                double latitude = mCurrentLocation.getLatitude();
+                double longitude = mCurrentLocation.getLongitude();
+                float accuracy = mCurrentLocation.getAccuracy();
+                double altitude = mCurrentLocation.getAltitude();
+                float bearing = mCurrentLocation.getBearing();
+                String provider = mCurrentLocation.getProvider();
+                float speed = mCurrentLocation.getSpeed();
+                long time = mCurrentLocation.getTime();
+
+                String jsonLocationData = "{\"provider\":\""+ provider +"\","+
+                "\"time\":\""+ time +"\"," +
+                "\"latitude\":\""+ latitude +"\","+
+                "\"longitude\":\""+ longitude +"\","+
+                "\"accuracy\":\""+ accuracy +"\","+
+                "\"speed\":\""+ speed +"\","+
+                "\"altitude\":\""+ altitude +"\","+
+                "\"bearing\":\""+ bearing + "\"}";
+
+                String path = "http://demo.path.one/api/device/" + RaceDetailsActivity.DEVICE_ID + "/report";
+
+                try {
+                    //instantiates httpclient to make request
+                    DefaultHttpClient httpclient = new DefaultHttpClient();
+
+                    //url with the post data
+                    HttpPost httpost = new HttpPost(path);
+
+                    //convert parameters into JSON object
+                    JSONObject holder = new JSONObject(jsonLocationData);
+
+                    //passes the results to a string builder/entity
+                    StringEntity se = new StringEntity(holder.toString());
+
+                    //sets the post request as the resulting string
+                    httpost.setEntity(se);
+                    //sets a request header so the page receving the request
+                    //will know what to do with it
+                    httpost.setHeader("Accept", "application/json");
+                    httpost.setHeader("Content-type", "application/json");
+
+                    //Handles what is returned from the page
+                    ResponseHandler responseHandler = new BasicResponseHandler();
+                    httpclient.execute(httpost, responseHandler);
+                }catch (Exception ex){
+
+                    Log.e("*** ERROR ***", ex.getMessage());
+                }
             }
         }
         Thread httpPost = new Thread(new HttpPostTask(this));

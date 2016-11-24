@@ -20,6 +20,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.math.BigInteger;
+
 import one.path.pathonetracking.trackingservice.LocationTrackingService;
 
 public class RaceDetailsActivity extends AppCompatActivity implements OnMapReadyCallback {
@@ -37,6 +39,9 @@ public class RaceDetailsActivity extends AppCompatActivity implements OnMapReady
 
     // the marker
     Marker now;
+
+    // device id
+    public static int DEVICE_ID = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,11 +63,12 @@ public class RaceDetailsActivity extends AppCompatActivity implements OnMapReady
         mapFragment.getMapAsync(this);
 
         // display device id
-        String deviceId = "ID " + Settings.Secure.getString(this.getContentResolver(),
+        String strDeviceId = Settings.Secure.getString(this.getContentResolver(),
                 Settings.Secure.ANDROID_ID);
 
+        DEVICE_ID = (new BigInteger(strDeviceId, 16)).intValue();
         EditText deviceIdText = (EditText) findViewById(R.id.deviceId);
-        deviceIdText.setText("ID " + deviceId);
+        deviceIdText.setText("ID " + DEVICE_ID);
     }
 
 

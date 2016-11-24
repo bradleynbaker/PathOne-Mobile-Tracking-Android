@@ -18,6 +18,8 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    useLibrary 'org.apache.http.legacy'
 }
 
 dependencies {
@@ -33,4 +35,5 @@ dependencies {
     testCompile 'junit:junit:4.12'
 
     compile 'com.google.android.gms:play-services-location:10.0.0'
+
 }
