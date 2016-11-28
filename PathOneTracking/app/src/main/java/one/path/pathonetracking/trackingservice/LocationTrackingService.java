@@ -21,7 +21,6 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONObject;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -169,9 +168,20 @@ public class LocationTrackingService extends Service implements
         LocationVo mLocVo = new LocationVo();
         mLocVo.setmLongitude(mCurrentLocation.getLongitude());
         mLocVo.setmLatitude(mCurrentLocation.getLatitude());
+        mLocVo.setQuality(mCurrentLocation.getProvider());
+        mLocVo.setHasAccuracy(mCurrentLocation.hasAccuracy());
+        mLocVo.setAccuracy(mCurrentLocation.getAccuracy());
+        mLocVo.setTime(mCurrentLocation.getTime());
+        mLocVo.setHasHeading(mCurrentLocation.hasBearing());
+        mLocVo.setHeading(mCurrentLocation.getBearing());
+        mLocVo.setHasSpeed(mCurrentLocation.hasSpeed());
+        mLocVo.setSpeed(mCurrentLocation.getSpeed());
+        mLocVo.setHasAltitude(mCurrentLocation.hasAltitude());
+        mLocVo.setAltitude(mCurrentLocation.getAltitude());
+        /*
         mLocVo.setmLocAddress(Const.getCompleteAddressString(this, mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()));
+        */
         mLocationData.add(mLocVo);
-
     }
 
     /**
@@ -233,23 +243,6 @@ public class LocationTrackingService extends Service implements
             Context theContext;
             HttpPostTask(Context ctx) { theContext = ctx; }
             public void run() {
-                double latitude = mCurrentLocation.getLatitude();
-                double longitude = mCurrentLocation.getLongitude();
-                float accuracy = mCurrentLocation.getAccuracy();
-                double altitude = mCurrentLocation.getAltitude();
-                float bearing = mCurrentLocation.getBearing();
-                String provider = mCurrentLocation.getProvider();
-                float speed = mCurrentLocation.getSpeed();
-                long time = mCurrentLocation.getTime();
-
-                String jsonLocationData = "{\"provider\":\""+ provider +"\","+
-                "\"time\":\""+ time +"\"," +
-                "\"latitude\":\""+ latitude +"\","+
-                "\"longitude\":\""+ longitude +"\","+
-                "\"accuracy\":\""+ accuracy +"\","+
-                "\"speed\":\""+ speed +"\","+
-                "\"altitude\":\""+ altitude +"\","+
-                "\"bearing\":\""+ bearing + "\"}";
 
                 String path = "http://demo.path.one/api/device/" + RaceDetailsActivity.DEVICE_ID + "/report";
 
@@ -260,11 +253,8 @@ public class LocationTrackingService extends Service implements
                     //url with the post data
                     HttpPost httpost = new HttpPost(path);
 
-                    //convert parameters into JSON object
-                    JSONObject holder = new JSONObject(jsonLocationData);
-
                     //passes the results to a string builder/entity
-                    StringEntity se = new StringEntity(holder.toString());
+                    StringEntity se = new StringEntity(LocationVo.fromLocation(mCurrentLocation).getJson().toString());
 
                     //sets the post request as the resulting string
                     httpost.setEntity(se);
