@@ -26,6 +26,7 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import one.path.pathonetracking.Constants;
 import one.path.pathonetracking.RaceDetailsActivity;
 
 public class LocationTrackingService extends Service implements
@@ -244,7 +245,7 @@ public class LocationTrackingService extends Service implements
             HttpPostTask(Context ctx) { theContext = ctx; }
             public void run() {
 
-                String path = "http://demo.path.one/api/device/" + RaceDetailsActivity.DEVICE_ID + "/report";
+                String path = "http://demo.path.one/api/device/" + (getApplicationContext().getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0)).getString(Constants.DEVICE_ID,null) + "/report";
 
                 try {
                     //instantiates httpclient to make request

@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -19,8 +18,6 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-
-import java.math.BigInteger;
 
 import one.path.pathonetracking.trackingservice.LocationTrackingService;
 
@@ -41,7 +38,7 @@ public class RaceDetailsActivity extends AppCompatActivity implements OnMapReady
     Marker now;
 
     // device id
-    public static int DEVICE_ID = 0;
+    // public static int DEVICE_ID = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,12 +60,18 @@ public class RaceDetailsActivity extends AppCompatActivity implements OnMapReady
         mapFragment.getMapAsync(this);
 
         // display device id
+        /*
         String strDeviceId = Settings.Secure.getString(this.getContentResolver(),
                 Settings.Secure.ANDROID_ID);
 
         DEVICE_ID = Math.abs((new BigInteger(strDeviceId, 16)).intValue());
+        */
+
+        // SharedPreferences pref = getApplicationContext().getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0); // 0 - for private mode
+
         EditText deviceIdText = (EditText) findViewById(R.id.deviceId);
-        deviceIdText.setText("ID " + DEVICE_ID);
+        // deviceIdText.setText("ID " + DEVICE_ID);
+        deviceIdText.setText("ID " + (getApplicationContext().getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0)).getInt(Constants.DEVICE_ID,0));
     }
 
 
