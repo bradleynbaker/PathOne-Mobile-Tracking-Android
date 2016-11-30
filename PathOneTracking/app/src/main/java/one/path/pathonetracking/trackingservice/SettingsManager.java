@@ -18,7 +18,7 @@ public class SettingsManager {
     // defaults
     public static final int PATH_ONE_PREFERENCE_MIN_REPORT_TIMEFRAME_CEL_DEFAULT = 30;
     public static final int PATH_ONE_PREFERENCE_MAX_REPORT_TIMEFRAME_CEL_DEFAULT = 60;
-    public static final int PATH_ONE_PREFERENCE_MIN_REPORT_TIMEFRAME_WIFI_DEFAULT = 1;
+    public static final int PATH_ONE_PREFERENCE_MIN_REPORT_TIMEFRAME_WIFI_DEFAULT = 2;
     public static final int PATH_ONE_PREFERENCE_MAX_REPORT_TIMEFRAME_WIFI_DEFAULT = 5;
     public static final int PATH_ONE_PREFERENCE_LAST_REPORT_TIME_DEFAULT = 0;
 

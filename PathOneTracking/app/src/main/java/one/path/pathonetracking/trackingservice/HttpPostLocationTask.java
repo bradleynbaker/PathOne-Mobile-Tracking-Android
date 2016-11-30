@@ -47,18 +47,19 @@ public class HttpPostLocationTask implements Runnable {
 
                 //Handles what is returned from the page
                 ResponseHandler responseHandler = new BasicResponseHandler();
+
+                Log.d("HttpPostLocationTask.run", "willl send: "+ se.toString());
                 httpclient.execute(httpost, responseHandler);
 
                 // we reported. Lets save timestamp
-                settings.setLastReportTime(System.nanoTime());
+                settings.setLastReportTime(System.currentTimeMillis());
 
 
             }catch (Exception ex){
-                Log.e("*** ERROR ***", ex.getMessage());
+                Log.e("*** ERROR ***", ex.getMessage(),ex);
             }
 
         }
-
 
 
     }
