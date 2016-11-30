@@ -16,23 +16,18 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
-import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.BasicResponseHandler;
-import org.apache.http.impl.client.DefaultHttpClient;
-
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-import one.path.pathonetracking.Constants;
 import one.path.pathonetracking.RaceDetailsActivity;
 
 public class LocationTrackingService extends Service implements
         LocationListener,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener{
+
+    SettingsManager settings;
 
     protected static final String TAG = "LocationTrackingService";
     /**
@@ -85,7 +80,7 @@ public class LocationTrackingService extends Service implements
 
         // LocalBroadcastManager broadcaster = LocalBroadcastManager.getInstance(this);
 
-
+        this.settings = new SettingsManager(this);
     }
 
     @Nullable
@@ -240,6 +235,8 @@ public class LocationTrackingService extends Service implements
         * {"provider":"fused","time":1478979485999,"latitude":28.6733794,"longitude":-82.1500887,"accuracy":4,"speed":0,"altitude":-10.115875120621,"bearing":96,"locationProvider":1}
         *
         * */
+
+        /*
         class HttpPostTask implements Runnable {
             Context theContext;
             HttpPostTask(Context ctx) { theContext = ctx; }
@@ -275,6 +272,9 @@ public class LocationTrackingService extends Service implements
         }
         Thread httpPost = new Thread(new HttpPostTask(this));
         httpPost.start();
+        */
+
+        new Thread(new HttpPostLocationTask(this, mCurrentLocation,this.settings)).start();
 
     }
 
