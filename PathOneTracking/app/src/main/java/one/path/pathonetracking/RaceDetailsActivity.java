@@ -7,9 +7,6 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
-import android.widget.EditText;
-import android.widget.ToggleButton;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -69,9 +66,17 @@ public class RaceDetailsActivity extends AppCompatActivity implements OnMapReady
 
         // SharedPreferences pref = getApplicationContext().getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0); // 0 - for private mode
 
-        EditText deviceIdText = (EditText) findViewById(R.id.deviceId);
+        // EditText deviceIdText = (EditText) findViewById(R.id.deviceId);
         // deviceIdText.setText("ID " + DEVICE_ID);
-        deviceIdText.setText("ID " + (getApplicationContext().getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0)).getInt(Constants.DEVICE_ID,0));
+        // deviceIdText.setText("ID " + (getApplicationContext().getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0)).getInt(Constants.DEVICE_ID,0));
+
+        // start service
+        if (!mIsServiceStarted) {
+            mIsServiceStarted = true;
+            // setButtonsEnabledState();
+            // OnGoingLocationNotification(this);
+            startService(new Intent(this, LocationTrackingService.class));
+        }
     }
 
 
@@ -81,7 +86,7 @@ public class RaceDetailsActivity extends AppCompatActivity implements OnMapReady
         bManager.unregisterReceiver(bReceiver);
     }
 
-
+    /*
     public void onToggleClicked(View view) {
         boolean on = ((ToggleButton) view).isChecked();
         if (on) {
@@ -102,6 +107,7 @@ public class RaceDetailsActivity extends AppCompatActivity implements OnMapReady
             }
         }
     }
+    */
 
     // broadcast receiver
     private BroadcastReceiver bReceiver = new BroadcastReceiver() {
@@ -112,12 +118,12 @@ public class RaceDetailsActivity extends AppCompatActivity implements OnMapReady
                 String locationCount = intent.getStringExtra("locationCount");
 
                 // update location on screen
-                EditText locationText = (EditText) findViewById(R.id.coords);
-                locationText.setText("Coords: " + location);
+                // EditText locationText = (EditText) findViewById(R.id.coords);
+                // locationText.setText("Coords: " + location);
 
                 // update record count
-                EditText locationCountText = (EditText) findViewById(R.id.editText3);
-                locationCountText.setText("Saved Locations " + locationCount);
+                // EditText locationCountText = (EditText) findViewById(R.id.editText3);
+                // locationCountText.setText("Saved Locations " + locationCount);
 
                 // update map
                 String[] parts = location.split(",");

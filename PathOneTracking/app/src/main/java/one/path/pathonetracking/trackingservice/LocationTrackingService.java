@@ -245,7 +245,7 @@ public class LocationTrackingService extends Service implements
             HttpPostTask(Context ctx) { theContext = ctx; }
             public void run() {
 
-                String path = "http://demo.path.one/api/device/" + (getApplicationContext().getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0)).getString(Constants.DEVICE_ID,null) + "/report";
+                String path = "http://demo.path.one/api/device/" + (getApplicationContext().getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0)).getInt(Constants.DEVICE_ID,0) + "/report";
 
                 try {
                     //instantiates httpclient to make request
