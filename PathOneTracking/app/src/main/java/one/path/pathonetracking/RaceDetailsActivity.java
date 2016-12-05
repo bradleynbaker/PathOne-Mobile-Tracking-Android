@@ -38,7 +38,9 @@ public class RaceDetailsActivity extends AppCompatActivity implements OnMapReady
     // device id
     // public static int DEVICE_ID = 0;
 
-    TextView scrollingTextView;
+    TextView textViewRacerName;
+    TextView textViewSignal;
+    TextView textViewExtraLine1;
     String currentAccuracy;
     String driver;
 
@@ -85,8 +87,17 @@ public class RaceDetailsActivity extends AppCompatActivity implements OnMapReady
 
 
 
-        scrollingTextView=(TextView)findViewById(R.id.textView9);
-        scrollingTextView.setSelected(true);
+        textViewRacerName=(TextView)findViewById(R.id.textView7);
+        textViewSignal=(TextView)findViewById(R.id.textView8);
+        textViewExtraLine1=(TextView)findViewById(R.id.textView9);
+
+        // lets set some defaults
+        textViewRacerName.setText("Device ID: " + String.valueOf((getApplicationContext()
+                .getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0))
+                .getInt(Constants.DEVICE_ID,0)));
+        textViewSignal.setText("Accuracy: ");
+        textViewExtraLine1.setText("Extra Information");
+
 
         // Update Scroling text
         Thread t = new Thread() {
@@ -99,9 +110,7 @@ public class RaceDetailsActivity extends AppCompatActivity implements OnMapReady
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                scrollingTextView.setText("Accuracy: " + currentAccuracy + "m"
-                                        + " | Device: "  + (getApplicationContext().getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0)).getInt(Constants.DEVICE_ID,0)
-                                        + "| Some meaningfull mesage for the driver.");
+                                textViewSignal.setText("Accuracy: " + currentAccuracy + "m");
                             }
                         });
                     }
