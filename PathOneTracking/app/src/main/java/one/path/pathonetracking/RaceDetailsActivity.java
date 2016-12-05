@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -77,6 +78,12 @@ public class RaceDetailsActivity extends AppCompatActivity implements OnMapReady
             // OnGoingLocationNotification(this);
             startService(new Intent(this, LocationTrackingService.class));
         }
+
+
+
+        TextView tv=(TextView)findViewById(R.id.textView9);
+        tv.setSelected(true);
+        tv.setText("Accuracy: Good | Driver: Jhon Doe | Some meaningfull mesage for the driver.");
     }
 
 
