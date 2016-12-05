@@ -9,4 +9,7 @@ public class Constants {
     public static final String DEVICE_ID = "device_id";
     public static final String LOGGED_IN_USERNAME = "logged_in_username";
 
+    public static final String ACCURACY = "accuracy";
+    public static final String SPEED = "speed";
+    public static final String SAMPLE_TIMESTAMP = "sample_timestamp";
 }

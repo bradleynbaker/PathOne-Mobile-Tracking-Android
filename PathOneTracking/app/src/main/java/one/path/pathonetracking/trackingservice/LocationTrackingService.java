@@ -228,8 +228,12 @@ public class LocationTrackingService extends Service implements
                 String locartion  = mCurrentLocation.getLatitude() + ", " + mCurrentLocation.getLongitude();
                 Intent RTReturn = new Intent(RaceDetailsActivity.PATHONE_TRACKING_SERVICE_CURRENT_POSITION_JSON);
                 RTReturn.putExtra("location", locartion);
+                RTReturn.putExtra(Constants.ACCURACY, String.valueOf(mCurrentLocation.getAccuracy()));
+
                 RTReturn.putExtra("locationCount", String.valueOf((LocationDBHelper.getInstance(theContext).getAllLocationLatLongDetails()).size()));
                 LocalBroadcastManager.getInstance(theContext).sendBroadcast(RTReturn);
+
+                Log.d("LOCATION BROADCAST DATA", LocationVo.fromLocation(mCurrentLocation).getJson().toString());
             }
         }
         Thread broadcast = new Thread(new BroadcastLocationTask(this));

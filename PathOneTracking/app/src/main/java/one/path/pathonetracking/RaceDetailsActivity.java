@@ -38,6 +38,10 @@ public class RaceDetailsActivity extends AppCompatActivity implements OnMapReady
     // device id
     // public static int DEVICE_ID = 0;
 
+    TextView scrollingTextView;
+    String currentAccuracy;
+    String driver;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,9 +85,34 @@ public class RaceDetailsActivity extends AppCompatActivity implements OnMapReady
 
 
 
-        TextView tv=(TextView)findViewById(R.id.textView9);
-        tv.setSelected(true);
-        tv.setText("Accuracy: Good | Driver: Jhon Doe | Some meaningfull mesage for the driver.");
+        scrollingTextView=(TextView)findViewById(R.id.textView9);
+        scrollingTextView.setSelected(true);
+
+        // Update Scroling text
+        Thread t = new Thread() {
+
+            @Override
+            public void run() {
+                try {
+                    while (!isInterrupted()) {
+                        Thread.sleep(30000);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                scrollingTextView.setText("Accuracy: " + currentAccuracy + "m"
+                                        + " | Device: "  + (getApplicationContext().getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0)).getInt(Constants.DEVICE_ID,0)
+                                        + "| Some meaningfull mesage for the driver.");
+                            }
+                        });
+                    }
+                } catch (InterruptedException e) {
+                }
+            }
+        };
+
+        t.start();
+        // ~Update Scroling text
+
     }
 
 
@@ -122,6 +151,7 @@ public class RaceDetailsActivity extends AppCompatActivity implements OnMapReady
         public void onReceive(Context context, Intent intent) {
             if(intent.getAction().equals(PATHONE_TRACKING_SERVICE_CURRENT_POSITION_JSON)) {
                 String location = intent.getStringExtra("location");
+                currentAccuracy = intent.getStringExtra(Constants.ACCURACY);
                 String locationCount = intent.getStringExtra("locationCount");
 
                 // update location on screen
@@ -151,6 +181,7 @@ public class RaceDetailsActivity extends AppCompatActivity implements OnMapReady
         mMap = googleMap;
         mMap.getUiSettings().setCompassEnabled(false);
         mMap.setTrafficEnabled(false);
+        mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
         try {
             mMap.setMyLocationEnabled(false);
         }catch (SecurityException ex){
