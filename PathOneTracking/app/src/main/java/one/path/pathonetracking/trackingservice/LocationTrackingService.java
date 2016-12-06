@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import one.path.pathonetracking.Constants;
+import one.path.pathonetracking.HttpLogger;
 import one.path.pathonetracking.RaceDetailsActivity;
 
 public class LocationTrackingService extends Service implements
@@ -139,6 +140,9 @@ public class LocationTrackingService extends Service implements
         // lets see how many records we have stored
         // ArrayList<LocationVo> locations = LocationDBHelper.getInstance(this).getAllLocationLatLongDetails();
         // Log.i(TAG, "*** RECORD COUNT: " + locations.size());
+
+        int deviceId = (getApplicationContext().getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0)).getInt(Constants.DEVICE_ID,0);
+        HttpLogger.logDebug(String.valueOf(deviceId), "onLocationChanged at " +mLastUpdateTime);
     }
 
     @Override
