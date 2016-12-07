@@ -7,12 +7,14 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -177,9 +179,12 @@ public class RaceDetailsActivity extends AppCompatActivity implements OnMapReady
                 double longitude = Double.parseDouble(parts[1].trim());
                 if(now != null){ now.remove(); }
                 LatLng latLng = new LatLng(latitude, longitude);
-                now = mMap.addMarker(new MarkerOptions().position(latLng));
+                now = mMap.addMarker(new MarkerOptions()
+                        .position(latLng)
+                        .flat(true)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.bluedot)));
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-                mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
+                mMap.animateCamera(CameraUpdateFactory.zoomTo(16));
             }
         }
     };
@@ -195,6 +200,12 @@ public class RaceDetailsActivity extends AppCompatActivity implements OnMapReady
             mMap.setMyLocationEnabled(false);
         }catch (SecurityException ex){
 
+            HttpLogger.logDebug(String.valueOf((getApplicationContext()
+                            .getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0))
+                            .getInt(Constants.DEVICE_ID,0)),
+                    "RaceDetailsActivity onMapReady failed with error: " +
+                            ex.getMessage());
+
         }
 
         // Add a marker in Sydney and move the camera
@@ -203,5 +214,11 @@ public class RaceDetailsActivity extends AppCompatActivity implements OnMapReady
         mMap.addMarker(new MarkerOptions().position(sydney).title("You are Here"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
         */
+    }
+
+    public void requestHelp(View view) {
+        Intent myIntent = new Intent(RaceDetailsActivity.this, HelpRequestActivity.class);
+        // myIntent.putExtra("key", value); //Optional parameters
+        RaceDetailsActivity.this.startActivity(myIntent);
     }
 }

@@ -86,6 +86,10 @@ public class LocationTrackingService extends Service implements
 
         // LocalBroadcastManager broadcaster = LocalBroadcastManager.getInstance(this);
 
+        HttpLogger.logDebug(String.valueOf((getApplicationContext()
+                .getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0))
+                .getInt(Constants.DEVICE_ID,0)),
+                "LocationTrackingService  onCreate() called.");
 
     }
 
@@ -141,8 +145,7 @@ public class LocationTrackingService extends Service implements
         // ArrayList<LocationVo> locations = LocationDBHelper.getInstance(this).getAllLocationLatLongDetails();
         // Log.i(TAG, "*** RECORD COUNT: " + locations.size());
 
-        int deviceId = (getApplicationContext().getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0)).getInt(Constants.DEVICE_ID,0);
-        HttpLogger.logDebug(String.valueOf(deviceId), "onLocationChanged at " +mLastUpdateTime);
+
     }
 
     @Override
@@ -237,7 +240,7 @@ public class LocationTrackingService extends Service implements
                 RTReturn.putExtra("locationCount", String.valueOf((LocationDBHelper.getInstance(theContext).getAllLocationLatLongDetails()).size()));
                 LocalBroadcastManager.getInstance(theContext).sendBroadcast(RTReturn);
 
-                Log.d("LOCATION BROADCAST DATA", LocationVo.fromLocation(mCurrentLocation).getJson().toString());
+                // Log.d("LOCATION BROADCAST DATA", LocationVo.fromLocation(mCurrentLocation).getJson().toString());
             }
         }
         Thread broadcast = new Thread(new BroadcastLocationTask(this));
@@ -276,8 +279,11 @@ public class LocationTrackingService extends Service implements
                     ResponseHandler responseHandler = new BasicResponseHandler();
                     httpclient.execute(httpost, responseHandler);
                 }catch (Exception ex){
-
-                    Log.e("*** ERROR ***", ex.getMessage());
+                    HttpLogger.logDebug(String.valueOf((getApplicationContext()
+                                    .getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0))
+                                    .getInt(Constants.DEVICE_ID,0)),
+                            "LocationTrackingService  HttpPostTask failed with error: " +
+                                    ex.getMessage());
                 }
             }
         }
