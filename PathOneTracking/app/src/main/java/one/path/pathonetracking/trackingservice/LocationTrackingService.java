@@ -237,7 +237,7 @@ public class LocationTrackingService extends Service implements
                 RTReturn.putExtra("location", locartion);
                 RTReturn.putExtra(Constants.ACCURACY, String.valueOf(mCurrentLocation.getAccuracy()));
 
-                RTReturn.putExtra("locationCount", String.valueOf((LocationDBHelper.getInstance(theContext).getAllLocationLatLongDetails()).size()));
+                // RTReturn.putExtra("locationCount", String.valueOf((LocationDBHelper.getInstance(theContext).getAllLocationLatLongDetails()).size()));
                 LocalBroadcastManager.getInstance(theContext).sendBroadcast(RTReturn);
 
                 // Log.d("LOCATION BROADCAST DATA", LocationVo.fromLocation(mCurrentLocation).getJson().toString());
