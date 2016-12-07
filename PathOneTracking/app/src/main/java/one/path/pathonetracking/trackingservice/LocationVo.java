@@ -17,6 +17,7 @@ public class LocationVo {
     private float heading; // bearing
     private float speed;
     private double altitude;
+    private String report_batch_id;
 
     private boolean hasLatitude;
     private boolean hasLongitude;
@@ -130,6 +131,10 @@ public class LocationVo {
     public void setAltitude(double altitude) {
         this.altitude = altitude;
     }
+
+    public String getReport_batch_id() { return report_batch_id; }
+
+    public void setReport_batch_id(String report_batch_id) { this.report_batch_id = report_batch_id; }
 
     public boolean hasLatitude() {
         return hasLatitude;

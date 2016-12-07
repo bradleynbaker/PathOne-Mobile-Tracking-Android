@@ -9,13 +9,13 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.ToggleButton;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -41,6 +41,12 @@ public class RaceDetailsActivity extends AppCompatActivity implements OnMapReady
 
     // device id
     // public static int DEVICE_ID = 0;
+
+    TextView textViewRacerName;
+    TextView textViewSignal;
+    TextView textViewExtraLine1;
+    String currentAccuracy;
+    String driver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,14 +77,64 @@ public class RaceDetailsActivity extends AppCompatActivity implements OnMapReady
 
         // SharedPreferences pref = getApplicationContext().getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0); // 0 - for private mode
 
+<<<<<<< HEAD
+        // EditText deviceIdText = (EditText) findViewById(R.id.deviceId);
+=======
         // lets clean time
         Log.d("RaceDetailsActivity", "System.currentTimeMillis(): " + System.currentTimeMillis());
         (new SettingsManager(this)).setLastReportTime(System.currentTimeMillis());
 
 
         EditText deviceIdText = (EditText) findViewById(R.id.deviceId);
+>>>>>>> master
         // deviceIdText.setText("ID " + DEVICE_ID);
-        deviceIdText.setText("ID " + (getApplicationContext().getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0)).getInt(Constants.DEVICE_ID,0));
+        // deviceIdText.setText("ID " + (getApplicationContext().getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0)).getInt(Constants.DEVICE_ID,0));
+
+        // start service
+        if (!mIsServiceStarted) {
+            mIsServiceStarted = true;
+            // setButtonsEnabledState();
+            // OnGoingLocationNotification(this);
+            startService(new Intent(this, LocationTrackingService.class));
+        }
+
+
+
+        textViewRacerName=(TextView)findViewById(R.id.textView7);
+        textViewSignal=(TextView)findViewById(R.id.textView8);
+        textViewExtraLine1=(TextView)findViewById(R.id.textView9);
+
+        // lets set some defaults
+        textViewRacerName.setText("Device ID: " + String.valueOf((getApplicationContext()
+                .getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0))
+                .getInt(Constants.DEVICE_ID,0)));
+        textViewSignal.setText("Accuracy: ");
+        textViewExtraLine1.setText("Extra Information");
+
+
+        // Update Scroling text
+        Thread t = new Thread() {
+
+            @Override
+            public void run() {
+                try {
+                    while (!isInterrupted()) {
+                        Thread.sleep(30000);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                textViewSignal.setText("Accuracy: " + currentAccuracy + "m");
+                            }
+                        });
+                    }
+                } catch (InterruptedException e) {
+                }
+            }
+        };
+
+        t.start();
+        // ~Update Scroling text
+
     }
 
 
@@ -88,7 +144,7 @@ public class RaceDetailsActivity extends AppCompatActivity implements OnMapReady
         bManager.unregisterReceiver(bReceiver);
     }
 
-
+    /*
     public void onToggleClicked(View view) {
         boolean on = ((ToggleButton) view).isChecked();
         if (on) {
@@ -109,6 +165,7 @@ public class RaceDetailsActivity extends AppCompatActivity implements OnMapReady
             }
         }
     }
+    */
 
     // broadcast receiver
     private BroadcastReceiver bReceiver = new BroadcastReceiver() {
@@ -116,15 +173,16 @@ public class RaceDetailsActivity extends AppCompatActivity implements OnMapReady
         public void onReceive(Context context, Intent intent) {
             if(intent.getAction().equals(PATHONE_TRACKING_SERVICE_CURRENT_POSITION_JSON)) {
                 String location = intent.getStringExtra("location");
+                currentAccuracy = intent.getStringExtra(Constants.ACCURACY);
                 String locationCount = intent.getStringExtra("locationCount");
 
                 // update location on screen
-                EditText locationText = (EditText) findViewById(R.id.coords);
-                locationText.setText("Coords: " + location);
+                // EditText locationText = (EditText) findViewById(R.id.coords);
+                // locationText.setText("Coords: " + location);
 
                 // update record count
-                EditText locationCountText = (EditText) findViewById(R.id.editText3);
-                locationCountText.setText("Saved Locations " + locationCount);
+                // EditText locationCountText = (EditText) findViewById(R.id.editText3);
+                // locationCountText.setText("Saved Locations " + locationCount);
 
                 // update map
                 String[] parts = location.split(",");
@@ -132,9 +190,12 @@ public class RaceDetailsActivity extends AppCompatActivity implements OnMapReady
                 double longitude = Double.parseDouble(parts[1].trim());
                 if(now != null){ now.remove(); }
                 LatLng latLng = new LatLng(latitude, longitude);
-                now = mMap.addMarker(new MarkerOptions().position(latLng));
+                now = mMap.addMarker(new MarkerOptions()
+                        .position(latLng)
+                        .flat(true)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.bluedot)));
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-                mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
+                mMap.animateCamera(CameraUpdateFactory.zoomTo(16));
             }
         }
     };
@@ -145,9 +206,16 @@ public class RaceDetailsActivity extends AppCompatActivity implements OnMapReady
         mMap = googleMap;
         mMap.getUiSettings().setCompassEnabled(false);
         mMap.setTrafficEnabled(false);
+        mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
         try {
             mMap.setMyLocationEnabled(false);
         }catch (SecurityException ex){
+
+            HttpLogger.logDebug(String.valueOf((getApplicationContext()
+                            .getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0))
+                            .getInt(Constants.DEVICE_ID,0)),
+                    "RaceDetailsActivity onMapReady failed with error: " +
+                            ex.getMessage());
 
         }
 
@@ -157,5 +225,11 @@ public class RaceDetailsActivity extends AppCompatActivity implements OnMapReady
         mMap.addMarker(new MarkerOptions().position(sydney).title("You are Here"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
         */
+    }
+
+    public void requestHelp(View view) {
+        Intent myIntent = new Intent(RaceDetailsActivity.this, HelpRequestActivity.class);
+        // myIntent.putExtra("key", value); //Optional parameters
+        RaceDetailsActivity.this.startActivity(myIntent);
     }
 }

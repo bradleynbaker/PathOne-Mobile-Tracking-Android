@@ -7,6 +7,9 @@ import android.database.sqlite.SQLiteDatabase;
 
 import java.util.ArrayList;
 
+import one.path.pathonetracking.Constants;
+import one.path.pathonetracking.HttpLogger;
+
 
 public class LocationDBHelper {
 
@@ -43,6 +46,13 @@ public class LocationDBHelper {
                 m_conVal.put(LocationMaster.mloc_latitude.name(), mcontacts.getmLatitude());
                 m_conVal.put(LocationMaster.mloc_longitude.name(), mcontacts.getmLongitude());
                 m_conVal.put(LocationMaster.mloc_address.name(), mcontacts.getmLocAddress());
+                m_conVal.put(LocationMaster.mloc_quality.name(), mcontacts.getQuality());
+                m_conVal.put(LocationMaster.mloc_accuracy.name(), mcontacts.getAccuracy());
+                m_conVal.put(LocationMaster.mloc_time.name(), mcontacts.getTime());
+                m_conVal.put(LocationMaster.mloc_heading.name(), mcontacts.getTime());
+                m_conVal.put(LocationMaster.mloc_speed.name(), mcontacts.getSpeed());
+                m_conVal.put(LocationMaster.mloc_altitude.name(), mcontacts.getAltitude());
+                m_conVal.put(LocationMaster.mloc_json_data.name(), mcontacts.getJson().toString());
 
                 m_provider.replace(LocationMaster.getName(), null, m_conVal);
                 System.err.println("Records Inserted.");
@@ -51,7 +61,11 @@ public class LocationDBHelper {
             m_provider.setTransactionSuccessful();
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            HttpLogger.logDebug(String.valueOf((mContext
+                            .getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0))
+                            .getInt(Constants.DEVICE_ID,0)),
+                    "LocationDBHelper insertLocationDetails failed with error: " +
+                            e.getMessage());
         } finally {
             if (m_provider != null)
                 m_provider.endTransaction();
@@ -104,7 +118,9 @@ public class LocationDBHelper {
     }
 
     public enum LocationMaster {
-        mloc_id, mloc_latitude, mloc_longitude, mloc_address;
+        mloc_id, mloc_latitude, mloc_longitude, mloc_address, mloc_quality,
+        mloc_accuracy, mloc_time, mloc_heading, mloc_speed,mloc_altitude,
+        report_batch_id, mloc_json_data;
 
         public static String getName() {
             return "location_table";
