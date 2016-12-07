@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -20,6 +21,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import one.path.pathonetracking.trackingservice.LocationTrackingService;
+import one.path.pathonetracking.trackingservice.SettingsManager;
 
 public class RaceDetailsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -75,7 +77,16 @@ public class RaceDetailsActivity extends AppCompatActivity implements OnMapReady
 
         // SharedPreferences pref = getApplicationContext().getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0); // 0 - for private mode
 
+<<<<<<< HEAD
         // EditText deviceIdText = (EditText) findViewById(R.id.deviceId);
+=======
+        // lets clean time
+        Log.d("RaceDetailsActivity", "System.currentTimeMillis(): " + System.currentTimeMillis());
+        (new SettingsManager(this)).setLastReportTime(System.currentTimeMillis());
+
+
+        EditText deviceIdText = (EditText) findViewById(R.id.deviceId);
+>>>>>>> master
         // deviceIdText.setText("ID " + DEVICE_ID);
         // deviceIdText.setText("ID " + (getApplicationContext().getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0)).getInt(Constants.DEVICE_ID,0));
 
