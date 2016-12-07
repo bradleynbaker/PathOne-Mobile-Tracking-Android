@@ -276,8 +276,20 @@ public class LocationTrackingService extends Service implements
                     httpost.setHeader("Content-type", "application/json");
 
                     //Handles what is returned from the page
-                    ResponseHandler responseHandler = new BasicResponseHandler();
-                    httpclient.execute(httpost, responseHandler);
+                    ResponseHandler<String>  responseHandler = new BasicResponseHandler();
+                    String responseBody = httpclient.execute(httpost, responseHandler);
+
+                    Log.d("LocationTrackingService  HttpPostTask got server response", responseBody);
+
+
+                    /*
+                    HttpLogger.logDebug(String.valueOf((getApplicationContext()
+                                    .getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0))
+                                    .getInt(Constants.DEVICE_ID,0)),
+                            "LocationTrackingService  HttpPostTask got server response: " +
+                                    responseBody);
+                     */
+
                 }catch (Exception ex){
                     HttpLogger.logDebug(String.valueOf((getApplicationContext()
                                     .getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0))
