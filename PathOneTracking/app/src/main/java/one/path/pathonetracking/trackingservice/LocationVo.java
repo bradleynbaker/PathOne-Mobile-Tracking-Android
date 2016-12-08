@@ -3,8 +3,11 @@ package one.path.pathonetracking.trackingservice;
 
 import android.location.Location;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.List;
 
 public class LocationVo {
 
@@ -18,6 +21,7 @@ public class LocationVo {
     private float speed;
     private double altitude;
     private String report_batch_id;
+    private String json;
 
     private boolean hasLatitude;
     private boolean hasLongitude;
@@ -82,6 +86,14 @@ public class LocationVo {
 
     public void setmLocAddress(String mLocAddress) {
         this.mLocAddress = mLocAddress;
+    }
+
+    public String getJson() {
+        return json;
+    }
+
+    public void setJson(String json) {
+        this.json = json;
     }
 
     public String getQuality() {
@@ -216,9 +228,7 @@ public class LocationVo {
         this.hasLocAddress = hasLocAddress;
     }
 
-
-
-    public JSONObject getJson(){
+    public JSONObject buildJson(){
 
         JSONObject json = new JSONObject();
 
@@ -237,5 +247,13 @@ public class LocationVo {
         }
 
         return json;
+    }
+
+    public static JSONArray buildJsonArray(List<LocationVo> list){
+        JSONArray array = new JSONArray();
+        for (LocationVo location : list){
+            array.put(location.buildJson());
+        }
+        return array;
     }
 }

@@ -4,8 +4,10 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import one.path.pathonetracking.Constants;
 import one.path.pathonetracking.HttpLogger;
@@ -49,10 +51,10 @@ public class LocationDBHelper {
                 m_conVal.put(LocationMaster.mloc_quality.name(), mcontacts.getQuality());
                 m_conVal.put(LocationMaster.mloc_accuracy.name(), mcontacts.getAccuracy());
                 m_conVal.put(LocationMaster.mloc_time.name(), mcontacts.getTime());
-                m_conVal.put(LocationMaster.mloc_heading.name(), mcontacts.getTime());
+                m_conVal.put(LocationMaster.mloc_heading.name(), mcontacts.getHeading());
                 m_conVal.put(LocationMaster.mloc_speed.name(), mcontacts.getSpeed());
                 m_conVal.put(LocationMaster.mloc_altitude.name(), mcontacts.getAltitude());
-                m_conVal.put(LocationMaster.mloc_json_data.name(), mcontacts.getJson().toString());
+                m_conVal.put(LocationMaster.mloc_json_data.name(), mcontacts.buildJson().toString());
 
                 m_provider.replace(LocationMaster.getName(), null, m_conVal);
                 System.err.println("Records Inserted.");
@@ -65,6 +67,45 @@ public class LocationDBHelper {
                             .getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0))
                             .getInt(Constants.DEVICE_ID,0)),
                     "LocationDBHelper insertLocationDetails failed with error: " +
+                            e.getMessage());
+        } finally {
+            if (m_provider != null)
+                m_provider.endTransaction();
+        }
+
+        return false;
+    }
+
+
+    public boolean updateLocationBatchId(List<LocationVo> locations, String batchId){
+        if (locations == null || locations.size() < 0 || batchId == null || batchId.isEmpty())
+            return false;
+
+        SQLiteDatabase m_provider = null;
+
+        StringBuffer sb = new StringBuffer();
+        sb.append("mloc_id IN(-1");
+        for (LocationVo location : locations){
+            sb.append(",").append(location.getmLocId());
+        }
+        sb.append(")");
+
+        Log.d("LOCATIONS TO SET BATCH ID: ", sb.toString());
+
+
+        try {
+            m_provider = SQLiteDBProvider.getInstance(mContext).openToWrite();
+            m_provider.beginTransaction();
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(LocationMaster.report_batch_id.name(), batchId);
+            m_provider.update(LocationMaster.getName(), contentValues, sb.toString(), null);
+            m_provider.setTransactionSuccessful();
+            return true;
+        }catch (Exception e) {
+            HttpLogger.logDebug(String.valueOf((mContext
+                            .getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0))
+                            .getInt(Constants.DEVICE_ID,0)),
+                    "LocationDBHelper updateLocationBatchId failed with error: " +
                             e.getMessage());
         } finally {
             if (m_provider != null)
@@ -116,6 +157,73 @@ public class LocationDBHelper {
         return m_arryContVo;
 
     }
+
+    public ArrayList<LocationVo> getUnsentLocations() {
+
+        ArrayList<LocationVo> m_arryContVo = new ArrayList<LocationVo>();
+        SQLiteDatabase m_provider = SQLiteDBProvider.getInstance(mContext).openToRead();
+
+        /*
+        *
+    tableName, tableColumns, whereClause, whereArgs, groupBy, having, orderBy
+        * */
+        Cursor m_contCursor = m_provider.query(
+                LocationMaster.getName(),
+                null,
+                "report_batch_id IS NULL",
+                null,
+                null,
+                null,
+                null, null);
+
+        if (m_contCursor.getCount() > 0) {
+            m_contCursor.moveToFirst();
+            do {
+                LocationVo m_conVo = new LocationVo();
+
+
+                m_conVo.setmLocId(m_contCursor.getInt(m_contCursor
+                        .getColumnIndex(LocationMaster.mloc_id.name())));
+
+                /*
+                m_conVo.setmLatitude(m_contCursor.getDouble(m_contCursor
+                        .getColumnIndex(LocationMaster.mloc_latitude.name())));
+
+                m_conVo.setmLongitude(m_contCursor.getDouble(m_contCursor
+                        .getColumnIndex(LocationMaster.mloc_longitude.name())));
+
+                m_conVo.setQuality(m_contCursor.getString(m_contCursor
+                        .getColumnIndex(LocationMaster.mloc_quality.name())));
+
+                m_conVo.setAccuracy(m_contCursor.getFloat(m_contCursor
+                        .getColumnIndex(LocationMaster.mloc_accuracy.name())));
+
+                m_conVo.setTime(m_contCursor.getLong(m_contCursor
+                        .getColumnIndex(LocationMaster.mloc_time.name())));
+
+                m_conVo.setHeading(m_contCursor.getFloat(m_contCursor
+                        .getColumnIndex(LocationMaster.mloc_heading.name())));
+
+                m_conVo.setSpeed(m_contCursor.getFloat(m_contCursor
+                        .getColumnIndex(LocationMaster.mloc_speed.name())));
+
+                m_conVo.setAltitude(m_contCursor.getDouble(m_contCursor
+                        .getColumnIndex(LocationMaster.mloc_altitude.name())));
+                */
+
+                m_conVo.setJson(m_contCursor.getString(m_contCursor
+                        .getColumnIndex(LocationMaster.mloc_json_data.name())));
+
+                m_arryContVo.add(m_conVo);
+
+            } while (m_contCursor.moveToNext());
+            m_contCursor.close();
+        }
+
+        return m_arryContVo;
+
+    }
+
 
     public enum LocationMaster {
         mloc_id, mloc_latitude, mloc_longitude, mloc_address, mloc_quality,
