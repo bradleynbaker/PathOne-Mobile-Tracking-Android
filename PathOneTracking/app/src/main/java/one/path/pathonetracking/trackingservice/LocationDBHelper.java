@@ -49,10 +49,10 @@ public class LocationDBHelper {
                 m_conVal.put(LocationMaster.mloc_quality.name(), mcontacts.getQuality());
                 m_conVal.put(LocationMaster.mloc_accuracy.name(), mcontacts.getAccuracy());
                 m_conVal.put(LocationMaster.mloc_time.name(), mcontacts.getTime());
-                m_conVal.put(LocationMaster.mloc_heading.name(), mcontacts.getTime());
+                m_conVal.put(LocationMaster.mloc_heading.name(), mcontacts.getHeading());
                 m_conVal.put(LocationMaster.mloc_speed.name(), mcontacts.getSpeed());
                 m_conVal.put(LocationMaster.mloc_altitude.name(), mcontacts.getAltitude());
-                m_conVal.put(LocationMaster.mloc_json_data.name(), mcontacts.getJson().toString());
+                m_conVal.put(LocationMaster.mloc_json_data.name(), mcontacts.buildJson().toString());
 
                 m_provider.replace(LocationMaster.getName(), null, m_conVal);
                 System.err.println("Records Inserted.");
@@ -116,6 +116,73 @@ public class LocationDBHelper {
         return m_arryContVo;
 
     }
+
+    public ArrayList<LocationVo> getUnsentLocations() {
+
+        ArrayList<LocationVo> m_arryContVo = new ArrayList<LocationVo>();
+        SQLiteDatabase m_provider = SQLiteDBProvider.getInstance(mContext).openToRead();
+
+        /*
+        *
+    tableName, tableColumns, whereClause, whereArgs, groupBy, having, orderBy
+        * */
+        Cursor m_contCursor = m_provider.query(
+                LocationMaster.getName(),
+                null,
+                "report_batch_id IS NULL",
+                null,
+                null,
+                null,
+                null, null);
+
+        if (m_contCursor.getCount() > 0) {
+            m_contCursor.moveToFirst();
+            do {
+                LocationVo m_conVo = new LocationVo();
+
+
+                m_conVo.setmLocId(m_contCursor.getInt(m_contCursor
+                        .getColumnIndex(LocationMaster.mloc_id.name())));
+
+                /*
+                m_conVo.setmLatitude(m_contCursor.getDouble(m_contCursor
+                        .getColumnIndex(LocationMaster.mloc_latitude.name())));
+
+                m_conVo.setmLongitude(m_contCursor.getDouble(m_contCursor
+                        .getColumnIndex(LocationMaster.mloc_longitude.name())));
+
+                m_conVo.setQuality(m_contCursor.getString(m_contCursor
+                        .getColumnIndex(LocationMaster.mloc_quality.name())));
+
+                m_conVo.setAccuracy(m_contCursor.getFloat(m_contCursor
+                        .getColumnIndex(LocationMaster.mloc_accuracy.name())));
+
+                m_conVo.setTime(m_contCursor.getLong(m_contCursor
+                        .getColumnIndex(LocationMaster.mloc_time.name())));
+
+                m_conVo.setHeading(m_contCursor.getFloat(m_contCursor
+                        .getColumnIndex(LocationMaster.mloc_heading.name())));
+
+                m_conVo.setSpeed(m_contCursor.getFloat(m_contCursor
+                        .getColumnIndex(LocationMaster.mloc_speed.name())));
+
+                m_conVo.setAltitude(m_contCursor.getDouble(m_contCursor
+                        .getColumnIndex(LocationMaster.mloc_altitude.name())));
+                */
+
+                m_conVo.setJson(m_contCursor.getString(m_contCursor
+                        .getColumnIndex(LocationMaster.mloc_json_data.name())));
+
+                m_arryContVo.add(m_conVo);
+
+            } while (m_contCursor.moveToNext());
+            m_contCursor.close();
+        }
+
+        return m_arryContVo;
+
+    }
+
 
     public enum LocationMaster {
         mloc_id, mloc_latitude, mloc_longitude, mloc_address, mloc_quality,

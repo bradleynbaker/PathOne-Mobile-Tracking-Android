@@ -4,6 +4,8 @@ package one.path.pathonetracking.trackingservice;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.telephony.TelephonyManager;
 
 /**
@@ -12,6 +14,26 @@ import android.telephony.TelephonyManager;
  *
  */
 public class Connectivity {
+
+    /**
+     * Retruns WIFI SSID if connected
+     *
+     * @param context
+     * @return
+     */
+    public static String getSSID(Context context){
+        String ssid = "";
+
+        if (Connectivity.isConnectedWifi(context)){
+            WifiManager wifiManager = (WifiManager) context.getSystemService (Context.WIFI_SERVICE);
+            WifiInfo info = wifiManager.getConnectionInfo ();
+            ssid  = info.getSSID();
+        }
+
+
+        return ssid;
+    }
+
 
     /**
      * Get the network info
