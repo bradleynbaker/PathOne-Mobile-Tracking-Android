@@ -143,6 +143,11 @@ public class SettingsManager {
     }
 
     public boolean ssidExists(String ssid){
+
+        // lets make it allways work
+        return true;
+
+        /*
         String currentSSID = this.getSSID();
 
         if(currentSSID.contains(ssid)){
@@ -150,7 +155,7 @@ public class SettingsManager {
         }else{
             return false;
         }
-
+        */
     }
 
 

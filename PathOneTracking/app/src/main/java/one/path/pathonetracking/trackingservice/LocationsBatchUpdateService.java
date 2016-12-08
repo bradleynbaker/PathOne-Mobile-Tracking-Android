@@ -8,6 +8,8 @@ import android.util.Log;
 import com.google.common.collect.Lists;
 
 import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.Iterator;
 import java.util.List;
@@ -53,30 +55,48 @@ public class LocationsBatchUpdateService extends Service {
         SettingsManager settings;
         String path;
 
+
         public MyThread(List<LocationVo> unsentLocations, SettingsManager settings, String path) {
             this.unsentLocations = unsentLocations;
             this.settings = settings;
             this.path = path;
+
         }
 
         public void run() {
+
+
+
             // get first 20
             List<List<LocationVo>> subSets = Lists.partition(unsentLocations, settings.getWifiLocationUploadBatchSize());
+            LocationDBHelper dbHelper = LocationDBHelper.getInstance(getApplicationContext());
 
             Iterator listsIterator = subSets.iterator();
             while(listsIterator.hasNext()){
                 List<LocationVo> locationsList = (List<LocationVo>)listsIterator.next();
+                String batchId = null;
                 // build batch
                 // JSONArray locationsJsonArray = LocationVo.buildJsonArray(locationsList);
                 JSONArray locationsJsonArray = new JSONArray();
+
                 for (LocationVo location : locationsList){
                     locationsJsonArray.put(location.getJson());
                 }
 
                 // send
-                String batchId = TrackingUtils.httpPostJsonData(path,locationsJsonArray.toString());
+                String strResp = TrackingUtils.httpPostJsonData(path,locationsJsonArray.toString());
 
-                Log.d("LocationsBatchUpdateService.onStartCommand BATCH ID:", batchId);
+                try {
+                    batchId = (String) new JSONObject(strResp).getJSONObject("data").get("bath_id");
+                } catch (JSONException e) {
+                    Log.e("LocationsBatchUpdateService:", e.getMessage(),e);
+                }
+
+                // lets update db is we have a batchid
+                if(batchId != null && !batchId.isEmpty()){
+                    dbHelper.updateLocationBatchId((List<LocationVo>) locationsList,batchId);
+                }
+
             }
 
         }

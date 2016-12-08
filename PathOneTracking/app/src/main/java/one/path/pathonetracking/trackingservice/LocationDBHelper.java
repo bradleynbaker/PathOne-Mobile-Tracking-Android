@@ -4,8 +4,10 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import one.path.pathonetracking.Constants;
 import one.path.pathonetracking.HttpLogger;
@@ -65,6 +67,45 @@ public class LocationDBHelper {
                             .getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0))
                             .getInt(Constants.DEVICE_ID,0)),
                     "LocationDBHelper insertLocationDetails failed with error: " +
+                            e.getMessage());
+        } finally {
+            if (m_provider != null)
+                m_provider.endTransaction();
+        }
+
+        return false;
+    }
+
+
+    public boolean updateLocationBatchId(List<LocationVo> locations, String batchId){
+        if (locations == null || locations.size() < 0 || batchId == null || batchId.isEmpty())
+            return false;
+
+        SQLiteDatabase m_provider = null;
+
+        StringBuffer sb = new StringBuffer();
+        sb.append("mloc_id IN(-1");
+        for (LocationVo location : locations){
+            sb.append(",").append(location.getmLocId());
+        }
+        sb.append(")");
+
+        Log.d("LOCATIONS TO SET BATCH ID: ", sb.toString());
+
+
+        try {
+            m_provider = SQLiteDBProvider.getInstance(mContext).openToWrite();
+            m_provider.beginTransaction();
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(LocationMaster.report_batch_id.name(), batchId);
+            m_provider.update(LocationMaster.getName(), contentValues, sb.toString(), null);
+            m_provider.setTransactionSuccessful();
+            return true;
+        }catch (Exception e) {
+            HttpLogger.logDebug(String.valueOf((mContext
+                            .getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0))
+                            .getInt(Constants.DEVICE_ID,0)),
+                    "LocationDBHelper updateLocationBatchId failed with error: " +
                             e.getMessage());
         } finally {
             if (m_provider != null)
