@@ -1,5 +1,7 @@
 package one.path.pathonetracking.trackingservice;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -18,6 +20,7 @@ import com.google.android.gms.location.LocationServices;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 import one.path.pathonetracking.Constants;
@@ -88,6 +91,20 @@ public class LocationTrackingService extends Service implements
                 "LocationTrackingService  onCreate() called.");
 
         this.settings = new SettingsManager(this);
+
+
+        // this is for December race.
+        // if we are on wifi network
+        // try to execute batch updates every 10 seconds
+
+        Intent myIntent = new Intent(this, LocationsBatchUpdateService.class);
+        PendingIntent pendingIntent = PendingIntent.getService(this,  0, myIntent, 0);
+        AlarmManager alarmManager = (AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.add(Calendar.SECOND, 10); // first time
+        long frequency= 10 * 1000; // in ms
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), frequency, pendingIntent);
     }
 
     @Nullable
@@ -242,7 +259,7 @@ public class LocationTrackingService extends Service implements
         }
         Thread broadcast = new Thread(new BroadcastLocationTask(this));
         broadcast.start();
-        
+
         new Thread(new HttpPostLocationTask(this, mCurrentLocation,this.settings)).start();
 
     }
