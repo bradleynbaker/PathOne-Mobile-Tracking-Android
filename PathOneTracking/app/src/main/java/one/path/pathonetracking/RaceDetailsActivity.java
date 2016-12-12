@@ -103,7 +103,7 @@ public class RaceDetailsActivity extends AppCompatActivity implements OnMapReady
                 .getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0))
                 .getInt(Constants.DEVICE_ID,0)));
         textViewSignal.setText("Accuracy: ");
-        textViewExtraLine1.setText("Extra Information");
+        // textViewExtraLine1.setText("Extra Information");
 
 
         // Update Scroling text
