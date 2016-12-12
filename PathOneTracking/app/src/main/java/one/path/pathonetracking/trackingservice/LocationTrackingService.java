@@ -1,5 +1,7 @@
 package one.path.pathonetracking.trackingservice;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -18,13 +20,11 @@ import com.google.android.gms.location.LocationServices;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
-<<<<<<< HEAD
 import one.path.pathonetracking.Constants;
 import one.path.pathonetracking.HttpLogger;
-=======
->>>>>>> master
 import one.path.pathonetracking.RaceDetailsActivity;
 
 public class LocationTrackingService extends Service implements
@@ -85,15 +85,26 @@ public class LocationTrackingService extends Service implements
 
         // LocalBroadcastManager broadcaster = LocalBroadcastManager.getInstance(this);
 
-<<<<<<< HEAD
         HttpLogger.logDebug(String.valueOf((getApplicationContext()
                 .getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0))
                 .getInt(Constants.DEVICE_ID,0)),
                 "LocationTrackingService  onCreate() called.");
 
-=======
         this.settings = new SettingsManager(this);
->>>>>>> master
+
+
+        // this is for December race.
+        // if we are on wifi network
+        // try to execute batch updates every 10 seconds
+
+        Intent myIntent = new Intent(this, LocationsBatchUpdateService.class);
+        PendingIntent pendingIntent = PendingIntent.getService(this,  0, myIntent, 0);
+        AlarmManager alarmManager = (AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.add(Calendar.SECOND, 10); // first time
+        long frequency= 10 * 1000; // in ms
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), frequency, pendingIntent);
     }
 
     @Nullable
@@ -248,65 +259,6 @@ public class LocationTrackingService extends Service implements
         }
         Thread broadcast = new Thread(new BroadcastLocationTask(this));
         broadcast.start();
-
-
-        /*
-        * {"provider":"fused","time":1478979485999,"latitude":28.6733794,"longitude":-82.1500887,"accuracy":4,"speed":0,"altitude":-10.115875120621,"bearing":96,"locationProvider":1}
-        *
-        * */
-
-        /*
-        class HttpPostTask implements Runnable {
-            Context theContext;
-            HttpPostTask(Context ctx) { theContext = ctx; }
-            public void run() {
-
-                String path = "http://demo.path.one/api/device/" + (getApplicationContext().getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0)).getInt(Constants.DEVICE_ID,0) + "/report";
-
-                try {
-                    //instantiates httpclient to make request
-                    DefaultHttpClient httpclient = new DefaultHttpClient();
-
-                    //url with the post data
-                    HttpPost httpost = new HttpPost(path);
-
-                    //passes the results to a string builder/entity
-                    StringEntity se = new StringEntity(LocationVo.fromLocation(mCurrentLocation).getJson().toString());
-
-                    //sets the post request as the resulting string
-                    httpost.setEntity(se);
-                    //sets a request header so the page receving the request
-                    //will know what to do with it
-                    httpost.setHeader("Accept", "application/json");
-                    httpost.setHeader("Content-type", "application/json");
-
-                    //Handles what is returned from the page
-                    ResponseHandler<String>  responseHandler = new BasicResponseHandler();
-                    String responseBody = httpclient.execute(httpost, responseHandler);
-
-                    Log.d("LocationTrackingService  HttpPostTask got server response", responseBody);
-
-
-                    /*
-                    HttpLogger.logDebug(String.valueOf((getApplicationContext()
-                                    .getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0))
-                                    .getInt(Constants.DEVICE_ID,0)),
-                            "LocationTrackingService  HttpPostTask got server response: " +
-                                    responseBody);
-                     */
-
-                }catch (Exception ex){
-                    HttpLogger.logDebug(String.valueOf((getApplicationContext()
-                                    .getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0))
-                                    .getInt(Constants.DEVICE_ID,0)),
-                            "LocationTrackingService  HttpPostTask failed with error: " +
-                                    ex.getMessage());
-                }
-            }
-        }
-        Thread httpPost = new Thread(new HttpPostTask(this));
-        httpPost.start();
-        */
 
         new Thread(new HttpPostLocationTask(this, mCurrentLocation,this.settings)).start();
 
