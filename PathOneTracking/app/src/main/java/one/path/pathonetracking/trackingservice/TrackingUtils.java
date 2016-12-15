@@ -1,5 +1,6 @@
 package one.path.pathonetracking.trackingservice;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.util.Log;
 
@@ -104,6 +105,17 @@ public class TrackingUtils {
         return response;
     }
 
+    public static boolean isServiceRunning(Class<?> serviceClass, Context context){
+        ActivityManager activityManager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
 
+        // Loop through the running services
+        for(ActivityManager.RunningServiceInfo service : activityManager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                // If the service is running then return true
+                return true;
+            }
+        }
+        return false;
+    }
 
 }

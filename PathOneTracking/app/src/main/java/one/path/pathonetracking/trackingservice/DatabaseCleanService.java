@@ -22,12 +22,16 @@ public class DatabaseCleanService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        // This describes what will happen when service is triggered
 
-        LocationDBHelper dbHelper = LocationDBHelper.getInstance(context);
-        Log.e("DatabaseCleanService", "Count before cleaning: " + dbHelper.countPositions());
-        dbHelper.removeOldPositions();
-        Log.e("DatabaseCleanService", "Count after cleaning: " + dbHelper.countPositions());
+        Log.e("DatabaseCleanService", "onHandleIntent will run: " + !TrackingUtils.isServiceRunning(LocationTrackingService.class, this));
+
+        // we do cleanup only if no location tracking running
+        if(!TrackingUtils.isServiceRunning(LocationTrackingService.class, this)) {
+            LocationDBHelper dbHelper = LocationDBHelper.getInstance(context);
+            Log.e("DatabaseCleanService", "Count before cleaning: " + dbHelper.countPositions());
+            dbHelper.removeOldPositions();
+            Log.e("DatabaseCleanService", "Count after cleaning: " + dbHelper.countPositions());
+        }
 
     }
 

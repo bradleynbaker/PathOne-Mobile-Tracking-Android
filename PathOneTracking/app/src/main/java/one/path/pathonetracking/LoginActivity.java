@@ -1,5 +1,7 @@
 package one.path.pathonetracking;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -24,6 +26,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.math.BigInteger;
+import java.util.Calendar;
+
+import one.path.pathonetracking.trackingservice.DatabaseCleanService;
 
 import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
@@ -75,17 +80,6 @@ public class LoginActivity extends AppCompatActivity {
 
         }
 
-
-
-
-
-
-
-
-
-
-
-
         // do we have a device id
         int deviceId = (getApplicationContext()
                 .getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0))
@@ -116,6 +110,19 @@ public class LoginActivity extends AppCompatActivity {
             // myIntent.putExtra("key", value); //Optional parameters
             LoginActivity.this.startActivity(myIntent);
         }
+
+
+
+
+        // Do cleanup and schedule
+        Intent anIntent = new Intent(this, DatabaseCleanService.class);
+        PendingIntent pendingIntent = PendingIntent.getService(this,  0, anIntent, 0);
+        AlarmManager alarmManager = (AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.add(Calendar.SECOND, 10); // first time in 10 seconds.
+        long frequency= 1000 * 60 * 60 * 24 * 7; // week in milliseconds
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), frequency, pendingIntent);
 
     }
 
