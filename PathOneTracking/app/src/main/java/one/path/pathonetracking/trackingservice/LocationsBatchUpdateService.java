@@ -76,20 +76,28 @@ public class LocationsBatchUpdateService extends Service {
 
             Iterator listsIterator = subSets.iterator();
             while(listsIterator.hasNext()){
+
+
+
+
                 List<LocationVo> locationsList = (List<LocationVo>)listsIterator.next();
                 String batchId = null;
                 // build batch
                 // JSONArray locationsJsonArray = LocationVo.buildJsonArray(locationsList);
+
+                try {
+
+
                 JSONArray locationsJsonArray = new JSONArray();
 
                 for (LocationVo location : locationsList){
-                    locationsJsonArray.put(location.getJson());
+                    locationsJsonArray.put(new JSONObject(location.getJson()));
                 }
 
                 // send
                 String strResp = TrackingUtils.httpPostJsonData(path,locationsJsonArray.toString());
 
-                try {
+
                     batchId = (String) new JSONObject(strResp).getJSONObject("data").get("bath_id");
                 } catch (JSONException e) {
                     Log.e("LocationsBatchUpdateService:", e.getMessage(),e);

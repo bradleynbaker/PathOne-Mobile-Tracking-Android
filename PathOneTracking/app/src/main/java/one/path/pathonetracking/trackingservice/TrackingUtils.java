@@ -80,7 +80,7 @@ public class TrackingUtils {
             //Handles what is returned from the page
             ResponseHandler<String> responseHandler = new BasicResponseHandler();
 
-            Log.d("TrackingUtils httpPostJsonData", "will send: "+ jsonData);
+            Log.d("TrackingUtils httpPostJsonData", "will send: "+ jsonData + " to: " + path);
             // response = httpclient.execute(httpost, responseHandler);
             HttpResponse httpResponse = httpclient.execute(httpost);
 

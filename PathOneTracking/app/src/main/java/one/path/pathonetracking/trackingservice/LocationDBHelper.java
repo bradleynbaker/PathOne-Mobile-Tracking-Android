@@ -42,6 +42,7 @@ public class LocationDBHelper {
             m_provider.beginTransaction();
             Cursor cursor = m_provider.rawQuery(
                     "select count(*) from location_table",null);
+            cursor.moveToFirst();
             count = cursor.getInt(0);
             m_provider.setTransactionSuccessful();
         }catch (Exception e) {
