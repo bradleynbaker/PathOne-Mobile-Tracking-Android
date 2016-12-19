@@ -146,6 +146,9 @@ public class LocationTrackingService extends Service implements
 
     @Override
     public void onLocationChanged(Location location) {
+
+        Log.d("LocationTrackingService onLocationChanged", location.getTime() + " - Lattitude: " + location.getLatitude() + " Longitude: " + location.getLongitude());
+
         mCurrentLocation = location;
         mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
         updateUI();

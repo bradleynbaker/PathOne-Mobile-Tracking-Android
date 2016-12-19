@@ -32,6 +32,80 @@ public class LocationDBHelper {
 
 
     /**
+     * Count
+     */
+    public int countPositions(){
+        int count = 0;
+        SQLiteDatabase m_provider = null;
+        try {
+            m_provider = SQLiteDBProvider.getInstance(mContext).openToRead();
+            m_provider.beginTransaction();
+            Cursor cursor = m_provider.rawQuery(
+                    "select count(*) from location_table",null);
+            cursor.moveToFirst();
+            count = cursor.getInt(0);
+            m_provider.setTransactionSuccessful();
+        }catch (Exception e) {
+            HttpLogger.logDebug(String.valueOf((mContext
+                            .getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0))
+                            .getInt(Constants.DEVICE_ID,0)),
+                    "LocationDBHelper countPositions failed with error: " +
+                            e.getMessage());
+        } finally {
+            if (m_provider != null)
+                m_provider.endTransaction();
+        }
+
+        return count;
+    }
+
+
+    /**
+     * Remove database records
+     */
+    public boolean removeOldPositions(){
+
+        SQLiteDatabase m_provider = null;
+
+        /*
+        Delete any records that were transmitted (have a Batch Number) and are 2 or more weeks old.
+        Autodelete all positions older than 2 months
+         */
+
+        long now = System.currentTimeMillis();
+        long day = (1000 * 60 * 60 * 24); // 24 hours in milliseconds
+        long twoWeeks = 14 * day; // two weeks
+        long twoMonths = 30 * day; // two weeks
+        long twoWeeksAgo = now - twoWeeks; // millis two weeks ago
+        long twoMonthsAgo = now - twoMonths; // millis two months ago
+
+        String query = "( report_batch_id is not null AND report_batch_id != '' " +
+                "AND mloc_time < " + twoWeeksAgo + ") || (mloc_time < "+ twoMonthsAgo +")";
+
+        Log.d("LocationDBHelper Query", query);
+
+        try {
+            m_provider = SQLiteDBProvider.getInstance(mContext).openToWrite();
+            m_provider.beginTransaction();
+            m_provider.delete(LocationMaster.getName(), query, null);
+            m_provider.setTransactionSuccessful();
+            return true;
+        }catch (Exception e) {
+            HttpLogger.logDebug(String.valueOf((mContext
+                            .getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0))
+                            .getInt(Constants.DEVICE_ID,0)),
+                    "LocationDBHelper updateLocationBatchId failed with error: " +
+                            e.getMessage());
+        } finally {
+            if (m_provider != null)
+                m_provider.endTransaction();
+        }
+
+
+        return true;
+    }
+
+    /**
      * Insert records of contacts into database.
      */
     public boolean insertLocationDetails(ArrayList<LocationVo> mContactsList) {

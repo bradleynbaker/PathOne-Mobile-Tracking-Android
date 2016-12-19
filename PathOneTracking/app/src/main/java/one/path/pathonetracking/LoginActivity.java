@@ -1,5 +1,7 @@
 package one.path.pathonetracking;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -24,12 +26,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.math.BigInteger;
+import java.util.Calendar;
 
-import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
-import static android.Manifest.permission.ACCESS_FINE_LOCATION;
-import static android.Manifest.permission.ACCESS_NETWORK_STATE;
-import static android.Manifest.permission.ACCESS_WIFI_STATE;
-import static android.Manifest.permission.INTERNET;
+import one.path.pathonetracking.trackingservice.DatabaseCleanService;
 
 /*
 import com.google.android.gms.appindexing.Action;
@@ -75,17 +74,6 @@ public class LoginActivity extends AppCompatActivity {
 
         }
 
-
-
-
-
-
-
-
-
-
-
-
         // do we have a device id
         int deviceId = (getApplicationContext()
                 .getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0))
@@ -110,12 +98,29 @@ public class LoginActivity extends AppCompatActivity {
                 .getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0))
                 .getString(Constants.LOGGED_IN_USERNAME,null);
 
+
+
+
+
+        // Do cleanup and schedule
+        Intent anIntent = new Intent(this, DatabaseCleanService.class);
+        PendingIntent pendingIntent = PendingIntent.getService(this,  0, anIntent, 0);
+        AlarmManager alarmManager = (AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.add(Calendar.SECOND, 10); // first time in 10 seconds.
+        long frequency= 1000 * 60 * 5; //TEST:5 minutes // 1000 * 60 * 60 * 24 * 7; // week in milliseconds
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), frequency, pendingIntent);
+
+
+
         if(loggedInUser != null){
             // we are already in.
             Intent myIntent = new Intent(LoginActivity.this, RacePickerActivity.class);
             // myIntent.putExtra("key", value); //Optional parameters
             LoginActivity.this.startActivity(myIntent);
         }
+
 
     }
 
@@ -243,11 +248,13 @@ public class LoginActivity extends AppCompatActivity {
     //Requesting permission
     private void requestPermission(){
 
+        /*
         if (ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.MAPS_RECEIVE)){
             //If the user has denied the permission previously your code will come to this block
             //Here you can explain why you need this permission
             //Explain here why you need this permission
         }
+        */
 
         //And finally ask for the permission
         /* <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -257,8 +264,12 @@ public class LoginActivity extends AppCompatActivity {
         <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> */
 
         ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.MAPS_RECEIVE,
-                ACCESS_COARSE_LOCATION,ACCESS_FINE_LOCATION,INTERNET,ACCESS_WIFI_STATE,
-                ACCESS_NETWORK_STATE},MULTIPLE_RECEIVE_CODE);
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.INTERNET,
+                Manifest.permission.ACCESS_WIFI_STATE,
+                Manifest.permission.ACCESS_NETWORK_STATE},
+                MULTIPLE_RECEIVE_CODE);
     }
 
     //This method will be called when the user will tap on allow or deny
