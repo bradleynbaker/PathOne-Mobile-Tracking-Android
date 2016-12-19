@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -17,14 +18,15 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import org.apache.http.client.ResponseHandler;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.math.BigInteger;
 import java.util.Calendar;
 
@@ -127,6 +129,8 @@ public class LoginActivity extends AppCompatActivity {
     // Login
     public void doLogin(View view) {
 
+        String registeredUserName = "A Racer";
+
         String user = ((EditText)findViewById(R.id.username)).getText().toString();
         if (user.matches("")) {
             Toast.makeText(this, "You did not enter a username", Toast.LENGTH_SHORT).show();
@@ -139,11 +143,75 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
+        String path = "http://demo.path.one/api/device/" +
+                (getApplicationContext()
+                        .getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0))
+                        .getInt(Constants.DEVICE_ID,0) + "/setuser";
+
+
+        // we need to exec http request on main thred.
+        // Doing this on login is kind of exception
+        // these 2 lines allows us to do this ugly thing.
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
+        try {
+            //instantiates httpclient to make request
+            DefaultHttpClient httpclient = new DefaultHttpClient();
+
+            //url with the post data
+            HttpPost httpost = new HttpPost(path);
+
+            //passes the results to a string builder/entity
+            JSONObject json = new JSONObject();
+
+            try {
+                json.put("username", user);
+                json.put("password", password);
+
+            } catch (JSONException e) {
+                Log.e("ERROR",e.getMessage());
+            }
+
+            StringEntity se = new StringEntity(json.toString());
+
+            //sets the post request as the resulting string
+            httpost.setEntity(se);
+            //sets a request header so the page receving the request
+            //will know what to do with it
+            httpost.setHeader("Accept", "application/json");
+            httpost.setHeader("Content-type", "application/json");
+
+            //Handles what is returned from the page
+            // ResponseHandler responseHandler = new BasicResponseHandler();
+            // httpclient.execute(httpost, responseHandler);
+            HttpResponse httpResponse = httpclient.execute(httpost);
+            BufferedReader rd = new BufferedReader(new InputStreamReader(httpResponse.getEntity().getContent()));
+
+            StringBuffer result = new StringBuffer();
+            String line = "";
+            while ((line = rd.readLine()) != null) {
+                result.append(line);
+            }
+
+            JSONObject response = new JSONObject(result.toString());
+            registeredUserName = ((JSONObject)response.getJSONObject("data")).getString("name");
+
+        }catch (Exception ex){
+
+            Log.e("*** ERROR ***", ex.getMessage());
+        }
+
+        /*
+
+
         // POST USER
         class HttpPostTask implements Runnable {
             Context theContext;
             String username;
             String password;
+
+
 
             HttpPostTask(Context ctx, String username, String password) {
                 theContext = ctx;
@@ -186,8 +254,20 @@ public class LoginActivity extends AppCompatActivity {
                     httpost.setHeader("Content-type", "application/json");
 
                     //Handles what is returned from the page
-                    ResponseHandler responseHandler = new BasicResponseHandler();
-                    httpclient.execute(httpost, responseHandler);
+                    // ResponseHandler responseHandler = new BasicResponseHandler();
+                    // httpclient.execute(httpost, responseHandler);
+                    HttpResponse httpResponse = httpclient.execute(httpost);
+                    BufferedReader rd = new BufferedReader(new InputStreamReader(httpResponse.getEntity().getContent()));
+
+                    StringBuffer result = new StringBuffer();
+                    String line = "";
+                    while ((line = rd.readLine()) != null) {
+                        result.append(line);
+                    }
+
+                    JSONObject response = new JSONObject(result.toString());
+
+
                 }catch (Exception ex){
 
                     Log.e("*** ERROR ***", ex.getMessage());
@@ -196,16 +276,18 @@ public class LoginActivity extends AppCompatActivity {
         }
         Thread httpPost = new Thread(new HttpPostTask(this, user,password));
         httpPost.start();
+        */
+
 
         SharedPreferences pref = getApplicationContext()
                 .getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0); // 0 - for private mode
         SharedPreferences.Editor editor = pref.edit();
         editor.putString(Constants.LOGGED_IN_USERNAME, user);
+        editor.putString(Constants.LOGGED_IN_REGISTERED_USERNAME, registeredUserName);
         editor.commit(); // commit changes
 
 
         Intent myIntent = new Intent(LoginActivity.this, RacePickerActivity.class);
-        // myIntent.putExtra("key", value); //Optional parameters
         LoginActivity.this.startActivity(myIntent);
     }
 
