@@ -234,7 +234,7 @@ public class RaceDetailsActivity extends AppCompatActivity implements OnMapReady
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);//Menu Resource, Menu
+        getMenuInflater().inflate(R.menu.race_details, menu);//Menu Resource, Menu
         return true;
     }
 
@@ -252,6 +252,9 @@ public class RaceDetailsActivity extends AppCompatActivity implements OnMapReady
                 Intent anIntent = new Intent(RaceDetailsActivity.this, LoginActivity.class);
                 RaceDetailsActivity.this.startActivity(anIntent);
                 return true;
+
+
+
             default:
                 return super.onOptionsItemSelected(item);
         }
