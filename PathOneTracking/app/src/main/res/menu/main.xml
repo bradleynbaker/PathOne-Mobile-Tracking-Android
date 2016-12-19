@@ -2,6 +2,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
+        android:id="@+id/action_logOut"
+        android:orderInCategory="10"
+        android:title="Log Out"/>
+
+    <item
         android:id="@+id/action_showSettings"
         android:orderInCategory="1"
         android:title="Settings"/>

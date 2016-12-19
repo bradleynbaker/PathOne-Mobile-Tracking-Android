@@ -7,6 +7,8 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
@@ -225,5 +227,33 @@ public class RaceDetailsActivity extends AppCompatActivity implements OnMapReady
         Intent myIntent = new Intent(RaceDetailsActivity.this, HelpRequestActivity.class);
         // myIntent.putExtra("key", value); //Optional parameters
         RaceDetailsActivity.this.startActivity(myIntent);
+    }
+
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);//Menu Resource, Menu
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_logOut:
+
+                // remove user from settings
+                (getApplicationContext()
+                        .getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0))
+                        .edit().remove(Constants.LOGGED_IN_USERNAME).apply();
+
+                // forward to login page
+                Intent anIntent = new Intent(RaceDetailsActivity.this, LoginActivity.class);
+                RaceDetailsActivity.this.startActivity(anIntent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }
