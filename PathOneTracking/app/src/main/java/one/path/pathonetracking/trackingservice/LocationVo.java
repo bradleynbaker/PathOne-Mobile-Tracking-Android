@@ -239,7 +239,7 @@ public class LocationVo {
             json.put("longitude", this.getmLongitude());
             if(this.hasAccuracy()) json.put("accuracy", this.getAccuracy());
             if(this.hasSpeed()) json.put("speed", this.getSpeed());
-            if(this.hasAltitude()) json.put("altitude", this.getmLongitude());
+            if(this.hasAltitude()) json.put("altitude", this.getAltitude());
             if(this.hasHeading()) json.put("heading", this.getHeading());
 
         } catch (JSONException e) {

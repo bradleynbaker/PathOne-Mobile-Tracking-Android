@@ -17,19 +17,15 @@
     <permission
         android:name="android.permission.ACCESS_COARSE_LOCATION"
         android:protectionLevel="signature" />
-
     <permission
         android:name="android.permission.ACCESS_FINE_LOCATION"
         android:protectionLevel="signature" />
-
     <permission
         android:name="android.permission.INTERNET"
         android:protectionLevel="signature" />
-
     <permission
         android:name="android.permission.ACCESS_WIFI_STATE"
         android:protectionLevel="signature" />
-
     <permission
         android:name="android.permission.ACCESS_NETWORK_STATE"
         android:protectionLevel="signature" />
@@ -90,7 +86,8 @@
 
         <service
             android:name=".trackingservice.DatabaseCleanService"
-            android:exported="false"></service>
+            android:exported="false" />
+
     </application>
 
 </manifest>

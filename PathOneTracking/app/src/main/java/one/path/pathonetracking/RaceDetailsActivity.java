@@ -23,6 +23,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import one.path.pathonetracking.trackingservice.LocationTrackingService;
 import one.path.pathonetracking.trackingservice.SettingsManager;
+import one.path.pathonetracking.trackingservice.TrackingUtils;
 
 public class RaceDetailsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -125,7 +126,15 @@ public class RaceDetailsActivity extends AppCompatActivity implements OnMapReady
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                textViewSignal.setText("Accuracy: " + currentAccuracy + "m");
+
+                                if(currentAccuracy != null){
+                                    textViewSignal.setText("Accuracy: " + TrackingUtils.getAccuracyString(Float.valueOf(currentAccuracy)) );
+                                }else{
+                                    textViewSignal.setText("Accuracy: --");
+                                }
+
+
+
                             }
                         });
                     }
@@ -195,9 +204,9 @@ public class RaceDetailsActivity extends AppCompatActivity implements OnMapReady
                 now = mMap.addMarker(new MarkerOptions()
                         .position(latLng)
                         .flat(true)
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.bluedot)));
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.reddot)));
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-                mMap.animateCamera(CameraUpdateFactory.zoomTo(16));
+                mMap.animateCamera(CameraUpdateFactory.zoomTo(17));
             }
         }
     };
@@ -246,6 +255,7 @@ public class RaceDetailsActivity extends AppCompatActivity implements OnMapReady
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Intent anIntent = null;
         switch (item.getItemId()) {
             case R.id.action_logOut:
 
@@ -255,10 +265,26 @@ public class RaceDetailsActivity extends AppCompatActivity implements OnMapReady
                         .edit().remove(Constants.LOGGED_IN_USERNAME).apply();
 
                 // forward to login page
-                Intent anIntent = new Intent(RaceDetailsActivity.this, LoginActivity.class);
+                anIntent = new Intent(RaceDetailsActivity.this, LoginActivity.class);
                 RaceDetailsActivity.this.startActivity(anIntent);
                 return true;
 
+            case R.id.action_leaveRace:
+
+                // stop logging
+                stopService(new Intent(getBaseContext(), LocationTrackingService.class));
+
+                // forward to login page
+                anIntent = new Intent(RaceDetailsActivity.this, RacePickerActivity.class);
+                RaceDetailsActivity.this.startActivity(anIntent);
+                return true;
+
+            case R.id.action_showSettings:
+
+                // forward to login page
+                // anIntent = new Intent(RaceDetailsActivity.this, SettingsActivity.class);
+                // RaceDetailsActivity.this.startActivity(anIntent);
+                return true;
 
 
             default:
