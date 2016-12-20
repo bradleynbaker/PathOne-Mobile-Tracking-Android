@@ -27,11 +27,11 @@ public class LocationsBatchUpdateService extends Service {
         // are any unsent location
         List<LocationVo> unsentLocations = dbHelper.getUnsentLocations();
 
-        Log.d("LocationsBatchUpdateService.onStartCommand unsent locations", String.valueOf(unsentLocations.size()) );
+        Log.d("unsent locations", String.valueOf(unsentLocations.size()) );
 
         if(unsentLocations.size() > 0 && Connectivity.isConnected(this)){
 
-            Log.d("LocationsBatchUpdateService.onStartCommand","Will start new thread");
+            Log.d("LocationsBatchUpdate","Will start new thread");
             Runnable r = new MyThread(unsentLocations, settings, path);
             new Thread(r).start();
         }

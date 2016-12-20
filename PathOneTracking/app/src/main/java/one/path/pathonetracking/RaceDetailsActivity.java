@@ -101,9 +101,15 @@ public class RaceDetailsActivity extends AppCompatActivity implements OnMapReady
         textViewExtraLine1=(TextView)findViewById(R.id.textView9);
 
         // lets set some defaults
+        /*
         textViewRacerName.setText("Device ID: " + String.valueOf((getApplicationContext()
                 .getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0))
                 .getInt(Constants.DEVICE_ID,0)));
+        */
+        textViewRacerName.setText("Racer: " + String.valueOf((getApplicationContext()
+                .getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0))
+                .getString(Constants.LOGGED_IN_REGISTERED_USERNAME,"A RACER")));
+
         textViewSignal.setText("Accuracy: ");
         // textViewExtraLine1.setText("Extra Information");
 
