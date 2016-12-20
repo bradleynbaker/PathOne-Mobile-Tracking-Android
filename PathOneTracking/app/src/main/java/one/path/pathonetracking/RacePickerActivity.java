@@ -75,6 +75,16 @@ public class RacePickerActivity extends AppCompatActivity {
                 Intent anIntent = new Intent(RacePickerActivity.this, LoginActivity.class);
                 RacePickerActivity.this.startActivity(anIntent);
                 return true;
+
+            case R.id.action_showSettings:
+
+                /*
+            anIntent = new Intent(RacePickerActivity.this, SettingsActivity.class);
+                RacePickerActivity.this.startActivity(anIntent);
+                */
+            return true;
+
+
             default:
                 return super.onOptionsItemSelected(item);
         }

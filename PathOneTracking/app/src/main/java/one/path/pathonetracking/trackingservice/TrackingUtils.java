@@ -118,4 +118,20 @@ public class TrackingUtils {
         return false;
     }
 
+    public static String getAccuracyString(float accuracy){
+
+        if(accuracy < 15){
+            return "GOOD";
+        }
+
+        if((15 <= accuracy)&& (accuracy <= 100)){
+            return "FAIR";
+        }
+        if(accuracy > 100){
+            return "BAD";
+        }
+
+        return "--";
+    }
+
 }
