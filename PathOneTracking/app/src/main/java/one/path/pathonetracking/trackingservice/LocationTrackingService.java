@@ -338,6 +338,7 @@ public class LocationTrackingService extends Service implements
 
     @Override
     public void onDestroy() {
+        Log.d("LocationTrackingService","LocationTrackingService Destroyed.");
         super.onDestroy();
         stopLocationUpdates();
     }

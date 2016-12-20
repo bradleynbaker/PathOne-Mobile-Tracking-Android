@@ -45,6 +45,12 @@ public class LocationsBatchUpdateService extends Service {
         return START_NOT_STICKY;
     }
 
+    @Override
+    public void onDestroy(){
+        Log.d("LocationsBatchUpdate","LocationsBatchUpdateService Destroyed.");
+    }
+
+
 
 
     @Override
