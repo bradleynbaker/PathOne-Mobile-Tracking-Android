@@ -9,6 +9,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import one.path.pathonetracking.trackingservice.LocationTrackingService;
+
 public class RacePickerActivity extends AppCompatActivity {
 
     ListView list;
@@ -66,6 +68,9 @@ public class RacePickerActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.action_logOut:
 
+                // stop logging
+                stopService(new Intent(getBaseContext(), LocationTrackingService.class));
+
                 // remove user from settings
                 (getApplicationContext()
                         .getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0))
@@ -78,10 +83,8 @@ public class RacePickerActivity extends AppCompatActivity {
 
             case R.id.action_showSettings:
 
-                /*
-            anIntent = new Intent(RacePickerActivity.this, SettingsActivity.class);
+                anIntent = new Intent(RacePickerActivity.this, SettingsActivity.class);
                 RacePickerActivity.this.startActivity(anIntent);
-                */
             return true;
 
 
