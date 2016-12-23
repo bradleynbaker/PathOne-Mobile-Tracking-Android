@@ -19,12 +19,12 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
 import one.path.pathonetracking.Constants;
-import one.path.pathonetracking.HttpLogger;
 import one.path.pathonetracking.RaceDetailsActivity;
 
 public class LocationTrackingService extends Service implements
@@ -35,17 +35,19 @@ public class LocationTrackingService extends Service implements
     SettingsManager settings;
 
     protected static final String TAG = "LocationTrackingService";
+
+
     /**
      * The desired interval for location updates. Inexact. Updates may be more or less frequent.
      */
-    public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 1000;
+    // public static final long UPDATE_INTERVAL_IN_MILLISECONDS = 1000;
 
     /**
      * The fastest rate for active location updates. Exact. Updates will never be more frequent
      * than this value.
      */
-    public static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS =
-            UPDATE_INTERVAL_IN_MILLISECONDS / 2;
+    // public static final long FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS =
+    //         UPDATE_INTERVAL_IN_MILLISECONDS / 2;
 
     // Keys for storing activity state in the Bundle.
     protected final static String REQUESTING_LOCATION_UPDATES_KEY = "requesting-location-updates-key";
@@ -85,10 +87,12 @@ public class LocationTrackingService extends Service implements
 
         // LocalBroadcastManager broadcaster = LocalBroadcastManager.getInstance(this);
 
+        /*
         HttpLogger.logDebug(String.valueOf((getApplicationContext()
                 .getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0))
                 .getInt(Constants.DEVICE_ID,0)),
                 "LocationTrackingService  onCreate() called.");
+        */
 
         this.settings = new SettingsManager(this);
 
@@ -102,8 +106,9 @@ public class LocationTrackingService extends Service implements
         AlarmManager alarmManager = (AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.add(Calendar.SECOND, 10); // first time
-        long frequency= 10 * 1000; // in ms
+        // calendar.add(Calendar.SECOND, 10); // first time
+        // long frequency= 10 * 1000; // in ms
+        long frequency = settings.getBatchUploadFrequency();
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), frequency, pendingIntent);
     }
 
@@ -147,7 +152,7 @@ public class LocationTrackingService extends Service implements
     @Override
     public void onLocationChanged(Location location) {
 
-        Log.d("LocationTrackingService onLocationChanged", location.getTime() + " - Lattitude: " + location.getLatitude() + " Longitude: " + location.getLongitude());
+        Log.d("PATHONE_LOG", location.getTime() + " - Lattitude: " + location.getLatitude() + " Longitude: " + location.getLongitude());
 
         mCurrentLocation = location;
         mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
@@ -265,6 +270,25 @@ public class LocationTrackingService extends Service implements
 
         new Thread(new HttpPostLocationTask(this, mCurrentLocation,this.settings)).start();
 
+
+        /*
+         *  Set last data in preferences
+         */
+
+        settings.setLastPostionString("Lat-Lon: " + mCurrentLocation.getLatitude() + ", " + mCurrentLocation.getLongitude());
+        settings.setAccuracy("Accuracy: " + mCurrentLocation.getAccuracy());
+
+
+
+        /*
+         *  ~Set last data in preferences
+         */
+
+
+
+
+
+
     }
 
 
@@ -289,13 +313,16 @@ public class LocationTrackingService extends Service implements
         // inexact. You may not receive updates at all if no location sources are available, or
         // you may receive them slower than requested. You may also receive updates faster than
         // requested if other applications are requesting location at a faster interval.
-        mLocationRequest.setInterval(UPDATE_INTERVAL_IN_MILLISECONDS);
+        mLocationRequest.setInterval(settings.getLocationServiceFixMeasureTime());
 
         // Sets the fastest rate for active location updates. This interval is exact, and your
         // application will never receive updates faster than this value.
-        mLocationRequest.setFastestInterval(FASTEST_UPDATE_INTERVAL_IN_MILLISECONDS);
+        mLocationRequest.setFastestInterval(settings.getLocationServiceFixMeasureTime()/2);
 
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+        mLocationRequest.setSmallestDisplacement(settings.getLocationServiceFixMeasureDistance());
+
     }
 
     /**

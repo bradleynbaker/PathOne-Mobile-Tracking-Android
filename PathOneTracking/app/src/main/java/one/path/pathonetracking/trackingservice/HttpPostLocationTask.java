@@ -4,6 +4,9 @@ package one.path.pathonetracking.trackingservice;
 import android.content.Context;
 import android.location.Location;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class HttpPostLocationTask implements Runnable {
     Context theContext;
     Location location;
@@ -22,9 +25,12 @@ public class HttpPostLocationTask implements Runnable {
         // are we connected?
         if(TrackingUtils.shouldReport(theContext,settings)){
 
-            String path = "http://demo.path.one/api/device/" + settings.getDeviceId() + "/report";
+            String path = settings.getServerBaseUrl() + "/api/device/" + settings.getDeviceId() + "/report";
 
             TrackingUtils.httpPostJsonData(path, LocationVo.fromLocation(location).buildJson().toString());
+
+            settings.setLastLiveReport("Last Live Report: " + new SimpleDateFormat("MM/dd/yyyy hh:mm:ss").format(new Date()));
+
 
             /*
             try {

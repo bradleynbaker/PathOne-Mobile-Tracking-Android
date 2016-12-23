@@ -50,7 +50,7 @@ public class LocationDBHelper {
                             .getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0))
                             .getInt(Constants.DEVICE_ID,0)),
                     "LocationDBHelper countPositions failed with error: " +
-                            e.getMessage());
+                            e.getMessage(),mContext);
         } finally {
             if (m_provider != null)
                 m_provider.endTransaction();
@@ -95,7 +95,7 @@ public class LocationDBHelper {
                             .getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0))
                             .getInt(Constants.DEVICE_ID,0)),
                     "LocationDBHelper updateLocationBatchId failed with error: " +
-                            e.getMessage());
+                            e.getMessage(),mContext);
         } finally {
             if (m_provider != null)
                 m_provider.endTransaction();
@@ -106,7 +106,7 @@ public class LocationDBHelper {
     }
 
     /**
-     * Insert records of contacts into database.
+     * Insert records into database.
      */
     public boolean insertLocationDetails(ArrayList<LocationVo> mContactsList) {
         if (mContactsList == null || mContactsList.size() < 0)
@@ -141,11 +141,14 @@ public class LocationDBHelper {
                             .getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0))
                             .getInt(Constants.DEVICE_ID,0)),
                     "LocationDBHelper insertLocationDetails failed with error: " +
-                            e.getMessage());
+                            e.getMessage(),mContext);
         } finally {
             if (m_provider != null)
                 m_provider.endTransaction();
         }
+
+
+        new SettingsManager(mContext).setNumberCachedPositions("Number Cached DataLogging Positions: " + countPositions());
 
         return false;
     }
@@ -164,7 +167,7 @@ public class LocationDBHelper {
         }
         sb.append(")");
 
-        Log.d("LOCATIONS TO SET BATCH ID: ", sb.toString());
+        Log.d("PATH_ONE_LOG: ", sb.toString());
 
 
         try {
@@ -180,7 +183,7 @@ public class LocationDBHelper {
                             .getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0))
                             .getInt(Constants.DEVICE_ID,0)),
                     "LocationDBHelper updateLocationBatchId failed with error: " +
-                            e.getMessage());
+                            e.getMessage(),mContext);
         } finally {
             if (m_provider != null)
                 m_provider.endTransaction();

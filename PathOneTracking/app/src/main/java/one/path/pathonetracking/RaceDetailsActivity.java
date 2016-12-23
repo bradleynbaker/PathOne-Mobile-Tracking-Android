@@ -226,7 +226,7 @@ public class RaceDetailsActivity extends AppCompatActivity implements OnMapReady
                             .getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0))
                             .getInt(Constants.DEVICE_ID,0)),
                     "RaceDetailsActivity onMapReady failed with error: " +
-                            ex.getMessage());
+                            ex.getMessage(),getApplicationContext());
 
         }
 
@@ -259,6 +259,9 @@ public class RaceDetailsActivity extends AppCompatActivity implements OnMapReady
         switch (item.getItemId()) {
             case R.id.action_logOut:
 
+                // stop logging
+                stopService(new Intent(getBaseContext(), LocationTrackingService.class));
+
                 // remove user from settings
                 (getApplicationContext()
                         .getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0))
@@ -282,8 +285,8 @@ public class RaceDetailsActivity extends AppCompatActivity implements OnMapReady
             case R.id.action_showSettings:
 
                 // forward to login page
-                // anIntent = new Intent(RaceDetailsActivity.this, SettingsActivity.class);
-                // RaceDetailsActivity.this.startActivity(anIntent);
+                anIntent = new Intent(RaceDetailsActivity.this, SettingsActivity.class);
+                RaceDetailsActivity.this.startActivity(anIntent);
                 return true;
 
 
