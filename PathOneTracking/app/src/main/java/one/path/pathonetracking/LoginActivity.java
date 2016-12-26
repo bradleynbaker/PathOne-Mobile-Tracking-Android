@@ -31,6 +31,7 @@ import java.math.BigInteger;
 import java.util.Calendar;
 
 import one.path.pathonetracking.trackingservice.DatabaseCleanService;
+import one.path.pathonetracking.trackingservice.SettingsManager;
 
 /*
 import com.google.android.gms.appindexing.Action;
@@ -52,11 +53,14 @@ public class LoginActivity extends AppCompatActivity {
     private int ACCESS_NETWORK_STATE_CODE = 105;
     */
 
+    SettingsManager settings;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        settings = new SettingsManager(getApplicationContext());
 
         // handle permisssions
         Log.d("BUILD VERSION", String.valueOf(Build.VERSION.SDK_INT));
@@ -77,22 +81,37 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         // do we have a device id
+        /*
         int deviceId = (getApplicationContext()
                 .getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0))
                 .getInt(Constants.DEVICE_ID,-1);
+        */
+        int deviceId = settings.getDeviceId();
 
         if(deviceId == -1){
+            // this is first run. set defauls.
+            settings.setLastReportTime(new Long(0));
+            settings.setMaxReportTimeframeCel(0);
+            settings.setMaxReportTimeframeWifi(0);
+            settings.setMinReportTimeframeCel(0);
+            settings.setMinReportTimeframeWifi(0);
+
+
+            /*
             SharedPreferences pref = getApplicationContext()
                     .getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0); // 0 - for private mode
             SharedPreferences.Editor editor = pref.edit();
+            */
 
             String strDeviceId = Settings.Secure.getString(this.getContentResolver(),
                     Settings.Secure.ANDROID_ID);
-
             deviceId = Math.abs((new BigInteger(strDeviceId, 16)).intValue());
+            settings.setDeviceId(deviceId);
 
+            /*
             editor.putInt(Constants.DEVICE_ID, deviceId);
             editor.commit(); // commit changes
+            */
         }
 
         // are we logged in?
@@ -143,10 +162,17 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
+        /*
         String path = "http://demo.path.one/api/device/" +
                 (getApplicationContext()
                         .getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0))
                         .getInt(Constants.DEVICE_ID,0) + "/setuser";
+        */
+
+        // String path = "http://demo.path.one/api/device/" + settings.getDeviceId() + "/setuser";
+        String path = settings.getServerBaseUrl() + "/api/device/" + settings.getDeviceId() + "/setuser";
+
+
 
 
         // we need to exec http request on main thred.

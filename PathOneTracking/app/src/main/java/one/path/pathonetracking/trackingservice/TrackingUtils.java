@@ -18,20 +18,20 @@ public class TrackingUtils {
 
     public static boolean shouldReport(Context context, SettingsManager settings){
 
-        Log.d("TrackingUtils.shouldReport", "System.nanoTime(): " + System.currentTimeMillis());
-        Log.d("TrackingUtils.shouldReport", "settings.getLastReportTime(): " + settings.getLastReportTime());
+        Log.d("TrackingUtils", "System.nanoTime(): " + System.currentTimeMillis());
+        Log.d("TrackingUtils", "settings.getLastReportTime(): " + settings.getLastReportTime());
 
         long timeDiff = System.currentTimeMillis() - settings.getLastReportTime();
         long secondsTimeDifference = timeDiff / 1000;
 
 
-        Log.d("TrackingUtils.shouldReport", "Time difference (s): " + secondsTimeDifference);
-        Log.d("TrackingUtils.shouldReport", "Connectivity.isConnected(context): " + Connectivity.isConnected(context));
-        Log.d("TrackingUtils.shouldReport", "Connectivity.isConnectedMobile(context): " + Connectivity.isConnectedMobile(context));
-        Log.d("TrackingUtils.shouldReport", "Connectivity.isConnectedWifi(context): " + Connectivity.isConnectedWifi(context));
+        Log.d("TrackingUtils", "Time difference (s): " + secondsTimeDifference);
+        Log.d("TrackingUtils", "Connectivity.isConnected(context): " + Connectivity.isConnected(context));
+        Log.d("TrackingUtils", "Connectivity.isConnectedMobile(context): " + Connectivity.isConnectedMobile(context));
+        Log.d("TrackingUtils", "Connectivity.isConnectedWifi(context): " + Connectivity.isConnectedWifi(context));
 
-        Log.d("TrackingUtils.shouldReport", "settings.getMinReportTimeframeWifi(): " + settings.getMinReportTimeframeWifi());
-        Log.d("TrackingUtils.shouldReport", "settings.getMaxReportTimeframeWifi(): " + settings.getMaxReportTimeframeWifi());
+        Log.d("TrackingUtils", "settings.getMinReportTimeframeWifi(): " + settings.getMinReportTimeframeWifi());
+        Log.d("TrackingUtils", "settings.getMaxReportTimeframeWifi(): " + settings.getMaxReportTimeframeWifi());
 
         if( Connectivity.isConnected(context) && ( (Connectivity.isConnectedMobile(context)
                 && settings.getMinReportTimeframeCel() > secondsTimeDifference
@@ -40,19 +40,19 @@ public class TrackingUtils {
                         && settings.getMinReportTimeframeWifi() < secondsTimeDifference
                         && settings.getMaxReportTimeframeWifi() > secondsTimeDifference)) ){
 
-            Log.d("TrackingUtils.shouldReport", "Will return true");
+            Log.d("TrackingUtils", "Will return true");
             return true;
         }else {
 
             // if max elapsed time has passed. reset it. otherwise we will never post again
             if(settings.getMaxReportTimeframeWifi() < secondsTimeDifference){
-                Log.d("TrackingUtils.shouldReport", "reset settings.setLastReportTime(System.nanoTime()): " + System.currentTimeMillis());
+                Log.d("TrackingUtils", "reset settings.setLastReportTime(System.nanoTime()): " + System.currentTimeMillis());
                 settings.setLastReportTime(System.currentTimeMillis());
             }
 
 
 
-            Log.d("TrackingUtils.shouldReport", "Will return false");
+            Log.d("TrackingUtils", "Will return false");
             return false;
         }
     }
@@ -80,7 +80,7 @@ public class TrackingUtils {
             //Handles what is returned from the page
             ResponseHandler<String> responseHandler = new BasicResponseHandler();
 
-            Log.d("TrackingUtils httpPostJsonData", "will send: "+ jsonData + " to: " + path);
+            Log.d("TrackingUtils", "will send: "+ jsonData + " to: " + path);
             // response = httpclient.execute(httpost, responseHandler);
             HttpResponse httpResponse = httpclient.execute(httpost);
 
@@ -95,7 +95,7 @@ public class TrackingUtils {
             response = result.toString();
 
             // response = EntityUtils.toString(httpResponse.getEntity());
-            Log.d("TrackingUtils httpPostJsonData", "returned: "+ response);
+            Log.d("TrackingUtils", "returned: "+ response);
 
 
         }catch (Exception ex){

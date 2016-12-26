@@ -1,6 +1,7 @@
 package one.path.pathonetracking.trackingservice;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
@@ -11,6 +12,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -22,7 +25,7 @@ public class LocationsBatchUpdateService extends Service {
 
         SettingsManager settings = new SettingsManager(getApplicationContext());
         LocationDBHelper dbHelper = LocationDBHelper.getInstance(getApplicationContext());
-        String path = "http://demo.path.one/api/device/" + settings.getDeviceId() + "/report";
+        String path = settings.getServerBaseUrl() + "/api/device/" + String.valueOf(settings.getDeviceId()) + "/report";
 
         // are any unsent location
         List<LocationVo> unsentLocations = dbHelper.getUnsentLocations();
@@ -32,7 +35,7 @@ public class LocationsBatchUpdateService extends Service {
         if(unsentLocations.size() > 0 && Connectivity.isConnected(this)){
 
             Log.d("LocationsBatchUpdate","Will start new thread");
-            Runnable r = new MyThread(unsentLocations, settings, path);
+            Runnable r = new MyThread(unsentLocations, this, settings, path);
             new Thread(r).start();
         }
 
@@ -63,30 +66,34 @@ public class LocationsBatchUpdateService extends Service {
         List<LocationVo> unsentLocations;
         SettingsManager settings;
         String path;
+        Context context;
 
-
-        public MyThread(List<LocationVo> unsentLocations, SettingsManager settings, String path) {
+        public MyThread(List<LocationVo> unsentLocations, Context context, SettingsManager settings, String path) {
             this.unsentLocations = unsentLocations;
             this.settings = settings;
             this.path = path;
-
+            this.context = context;
         }
 
         public void run() {
 
 
+            Log.d("PATH_ONE_LOG","settings.getBatchUploadWifiOnly(): " + settings.getBatchUploadWifiOnly());
 
-            // get first 20
-            List<List<LocationVo>> subSets = Lists.partition(unsentLocations, settings.getWifiLocationUploadBatchSize());
+
+            // should we run? ;)
+            if (Connectivity.isConnected(context) && Connectivity.isConnectedWifi(context) == settings.getBatchUploadWifiOnly()){
+
+
+                // get first 20
+                List<List<LocationVo>> subSets = Lists.partition(unsentLocations, settings.getWifiLocationUploadBatchSize());
             LocationDBHelper dbHelper = LocationDBHelper.getInstance(getApplicationContext());
 
             Iterator listsIterator = subSets.iterator();
-            while(listsIterator.hasNext()){
+            while (listsIterator.hasNext()) {
 
 
-
-
-                List<LocationVo> locationsList = (List<LocationVo>)listsIterator.next();
+                List<LocationVo> locationsList = (List<LocationVo>) listsIterator.next();
                 String batchId = null;
                 // build batch
                 // JSONArray locationsJsonArray = LocationVo.buildJsonArray(locationsList);
@@ -94,27 +101,32 @@ public class LocationsBatchUpdateService extends Service {
                 try {
 
 
-                JSONArray locationsJsonArray = new JSONArray();
+                    JSONArray locationsJsonArray = new JSONArray();
 
-                for (LocationVo location : locationsList){
-                    locationsJsonArray.put(new JSONObject(location.getJson()));
-                }
+                    for (LocationVo location : locationsList) {
+                        locationsJsonArray.put(new JSONObject(location.getJson()));
+                    }
 
-                // send
-                String strResp = TrackingUtils.httpPostJsonData(path,locationsJsonArray.toString());
+                    // send
+                    String strResp = TrackingUtils.httpPostJsonData(path, locationsJsonArray.toString());
 
 
                     batchId = (String) new JSONObject(strResp).getJSONObject("data").get("bath_id");
+
+
+                    settings.setLastDataLogUpload("Last Data Log Upload: " + new SimpleDateFormat("MM/dd/yyyy hh:mm:ss").format(new Date()));
                 } catch (JSONException e) {
-                    Log.e("LocationsBatchUpdateService:", e.getMessage(),e);
+                    Log.e("PATHONE_LOG:", e.getMessage(), e);
                 }
 
                 // lets update db is we have a batchid
-                if(batchId != null && !batchId.isEmpty()){
-                    dbHelper.updateLocationBatchId((List<LocationVo>) locationsList,batchId);
+                if (batchId != null && !batchId.isEmpty()) {
+                    dbHelper.updateLocationBatchId((List<LocationVo>) locationsList, batchId);
                 }
 
             }
+
+        }
 
         }
     }

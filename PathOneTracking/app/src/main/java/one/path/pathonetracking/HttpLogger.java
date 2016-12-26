@@ -1,5 +1,6 @@
 package one.path.pathonetracking;
 
+import android.content.Context;
 import android.util.Log;
 
 import org.apache.http.client.ResponseHandler;
@@ -10,27 +11,32 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import one.path.pathonetracking.trackingservice.SettingsManager;
+
 public class HttpLogger {
 
-    public static void logDebug(String device, String message){
-        (new Thread(new HttpPostTask(device, "DEBUG", message))).start();
+    public static void logDebug(String device, String message, Context context){
+
+        String path = (new SettingsManager(context)).getServerBaseUrl() + "/api/device/" + device + "/report";
+
+        (new Thread(new HttpPostTask(path, "DEBUG", message))).start();
     }
 
     static class HttpPostTask implements Runnable {
 
-        String device;
+        String path;
         String message;
         String tag;
 
-        HttpPostTask(String device, String tag, String message) {
-            this.device = device;
+        HttpPostTask(String path, String tag, String message) {
+            this.path = path;
             this.message = message;
             this.tag = tag;
         }
 
         public void run() {
 
-            String path = "http://demo.path.one/api/device/" + this.device + "/report";
+            // String path = "http://demo.path.one/api/device/" + this.device + "/report";
 
             try {
                 //instantiates httpclient to make request
