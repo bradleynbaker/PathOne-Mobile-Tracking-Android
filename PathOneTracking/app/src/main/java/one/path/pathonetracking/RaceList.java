@@ -8,17 +8,19 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class CustomList extends ArrayAdapter<String> {
+import one.path.pathonetracking.trackingservice.TrackingUtils;
+
+public class RaceList extends ArrayAdapter<String> {
 
     private final Activity context;
-    private final String[] web;
-    private final Integer[] imageId;
-    public CustomList(Activity context,
-                      String[] web, Integer[] imageId) {
-        super(context, R.layout.list_single, web);
+    private final String[] raceName;
+    private final String[] raceImage;
+    public RaceList(Activity context,
+                      String[] raceName, String[] raceImage) {
+        super(context, R.layout.list_single, raceName);
         this.context = context;
-        this.web = web;
-        this.imageId = imageId;
+        this.raceName = raceName;
+        this.raceImage = raceImage;
 
     }
     @Override
@@ -28,9 +30,11 @@ public class CustomList extends ArrayAdapter<String> {
         TextView txtTitle = (TextView) rowView.findViewById(R.id.txt);
 
         ImageView imageView = (ImageView) rowView.findViewById(R.id.img);
-        txtTitle.setText(web[position]);
+        txtTitle.setText(raceName[position]);
 
-        imageView.setImageResource(imageId[position]);
+        // imageView.setImageResource(raceImage[position]);
+
+        TrackingUtils.loadImageFromURL(raceImage[position],imageView);
         return rowView;
     }
 

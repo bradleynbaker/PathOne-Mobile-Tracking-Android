@@ -3,38 +3,60 @@ package one.path.pathonetracking;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import one.path.pathonetracking.trackingservice.LocationTrackingService;
+import one.path.pathonetracking.trackingservice.SettingsManager;
 
 public class RacePickerActivity extends AppCompatActivity {
 
+    SettingsManager settings;
+
     ListView list;
-    String[] web = {
-            "Baja 1000",
-            "San Felipe 250",
-            "Baja 500"
-    } ;
-    Integer[] imageId = {
-            R.drawable.baja1000,
-            R.drawable.logo100,
-            R.drawable.baja500
-    };
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        settings = new SettingsManager(getApplicationContext());
+        JSONArray races = null;
+        String[] raceNames = new String[0];
+        String[] raceImages = new String[0];
+
+        try {
+            JSONObject json = new JSONObject(settings.getAvailableRaces());
+
+
+            String strRaces = json.getString("data");
+            races = new JSONArray(strRaces);
+
+            raceNames= new String[races.length()];
+            raceImages= new String[races.length()];
+
+            for (int i = 0; i < races.length(); i++) {
+                raceNames[i] = races.getJSONObject(i).getString("name");
+                raceImages[i] = races.getJSONObject(i).getString("logo");
+            }
+        }catch (Exception ex){
+            Log.e("PATH_ONE", ex.getMessage(),ex);
+        }
+
+
         setContentView(R.layout.activity_race_picker);
 
 
-        CustomList adapter = new
-                CustomList(RacePickerActivity.this, web, imageId);
+        // CustomList adapter = new
+        //         CustomList(RacePickerActivity.this, web, imageId);
+        RaceList adapter = new
+                RaceList(RacePickerActivity.this, raceNames, raceImages);
+
         list=(ListView)findViewById(R.id.list);
         list.setAdapter(adapter);
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -42,7 +64,8 @@ public class RacePickerActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                                     int position, long id) {
-                // Toast.makeText(RacePickerActivity.this, "You Clicked at " +web[+ position], Toast.LENGTH_SHORT).show();
+
+                settings.setSelectedRace(String.valueOf(position));
                 showRaceDetails(view);
             }
         });

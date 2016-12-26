@@ -27,6 +27,10 @@ public class SettingsManager {
     public static final String PATH_ONE_PREFERENCE_LAST_LIVE_REPORT = "PATH_ONE_PREFERENCE_LAST_LIVE_REPORT";
     public static final String PATH_ONE_PREFERENCE_LAST_DATA_LOG_UPLOAD = "PATH_ONE_PREFERENCE_LAST_DATA_LOG_UPLOAD";
     public static final String PATH_ONE_PREFERENCE_CACHED_POSTITIONS = "PATH_ONE_PREFERENCE_CACHED_POSTITIONS";
+    public static final String PATH_ONE_AVAILABLE_RACES = "PATH_ONE_AVAILABLE_RACES";
+    public static final String PATH_ONE_SELECTED_RACE = "PATH_ONE_SELECTED_RACE";
+
+
 
     // defaults
     public static final int PATH_ONE_PREFERENCE_MIN_REPORT_TIMEFRAME_CEL_DEFAULT = 30;
@@ -309,6 +313,31 @@ public class SettingsManager {
                         EMPTY_DEFAULT);
     }
 
+    public void setAvailableRaces(String aString){
+        (context.getApplicationContext()
+                .getSharedPreferences(PATH_ONE_SHARED_PREFERENCES, MODE_PRIVATE))
+                .edit().putString(PATH_ONE_AVAILABLE_RACES,
+                aString).commit();
+    }
 
+    public String getAvailableRaces(){
+        return context.getApplicationContext()
+                .getSharedPreferences(PATH_ONE_SHARED_PREFERENCES, MODE_PRIVATE)
+                .getString(PATH_ONE_AVAILABLE_RACES,
+                        EMPTY_DEFAULT);
+    }
 
+    public void setSelectedRace(String aString){
+        (context.getApplicationContext()
+                .getSharedPreferences(PATH_ONE_SHARED_PREFERENCES, MODE_PRIVATE))
+                .edit().putString(PATH_ONE_SELECTED_RACE,
+                aString).commit();
+    }
+
+    public String getSelectedRace(){
+        return context.getApplicationContext()
+                .getSharedPreferences(PATH_ONE_SHARED_PREFERENCES, MODE_PRIVATE)
+                .getString(PATH_ONE_SELECTED_RACE,
+                        EMPTY_DEFAULT);
+    }
 }

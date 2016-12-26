@@ -11,6 +11,7 @@ import java.util.List;
 
 import one.path.pathonetracking.Constants;
 import one.path.pathonetracking.HttpLogger;
+import one.path.pathonetracking.trackingservice.model.Race;
 
 
 public class LocationDBHelper {
@@ -311,4 +312,114 @@ public class LocationDBHelper {
             return "location_table";
         }
     }
+
+    public enum RaceMaster {
+        race_id,
+        race_name,
+        race_image,
+        race_image_url;
+
+        public static String getName() {
+            return "races_table";
+        }
+    }
+
+    public ArrayList<Race> getAvailableRaces() {
+
+        ArrayList<Race> array = new ArrayList<Race>();
+        SQLiteDatabase m_provider = SQLiteDBProvider.getInstance(mContext).openToRead();
+
+        Cursor cursor = m_provider.query(
+                RaceMaster.getName(),
+                null,
+                null,
+                null,
+                null,
+                null,
+                null, null);
+
+        if (cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            do {
+                Race race = new Race(cursor.getInt(cursor.getColumnIndex(RaceMaster.race_id.name())),
+                        cursor.getString(cursor.getColumnIndex(RaceMaster.race_name.name())),
+                        cursor.getString(cursor.getColumnIndex(RaceMaster.race_image_url.name())),
+                        cursor.getBlob(cursor.getColumnIndex(RaceMaster.race_image.name())));
+
+
+                array.add(race);
+
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+
+        return array;
+
+    }
+
+    public boolean insertRaces(ArrayList<Race> races) {
+        if (races == null || races.size() < 0)
+            return true;
+        SQLiteDatabase m_provider = null;
+        try {
+            m_provider = SQLiteDBProvider.getInstance(mContext).openToWrite();
+            m_provider.beginTransaction();
+
+            for (final Race race : races) {
+
+                ContentValues contentValues = new ContentValues();
+                contentValues.put(RaceMaster.race_name.name(), race.getName());
+                contentValues.put(RaceMaster.race_id.name(), race.getId());
+                contentValues.put(RaceMaster.race_image.name(), race.getImage());
+                contentValues.put(RaceMaster.race_image_url.name(), race.getImageUrl());
+
+                m_provider.insert(RaceMaster.getName(), null, contentValues);
+                System.err.println("Records Inserted.");
+            }
+
+            m_provider.setTransactionSuccessful();
+            return true;
+        } catch (Exception e) {
+            HttpLogger.logDebug(String.valueOf((mContext
+                            .getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0))
+                            .getInt(Constants.DEVICE_ID,0)),
+                    "LocationDBHelper insertRaces failed with error: " +
+                            e.getMessage(),mContext);
+        } finally {
+            if (m_provider != null)
+                m_provider.endTransaction();
+        }
+
+
+        return false;
+    }
+
+    public boolean clearRacesTable(){
+
+        SQLiteDatabase m_provider = null;
+
+
+        try {
+            m_provider = SQLiteDBProvider.getInstance(mContext).openToWrite();
+            m_provider.beginTransaction();
+            m_provider.execSQL("delete from "+ RaceMaster.getName());
+            m_provider.setTransactionSuccessful();
+            return true;
+        }catch (Exception e) {
+            HttpLogger.logDebug(String.valueOf((mContext
+                            .getSharedPreferences(Constants.PATH_ONE_SHARED_PREFERENCES, 0))
+                            .getInt(Constants.DEVICE_ID,0)),
+                    "LocationDBHelper clearRacesTable failed with error: " +
+                            e.getMessage(),mContext);
+        } finally {
+            if (m_provider != null)
+                m_provider.endTransaction();
+        }
+
+
+        return true;
+    }
+
+
+
 }

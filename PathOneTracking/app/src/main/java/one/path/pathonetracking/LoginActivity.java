@@ -19,6 +19,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -133,7 +134,8 @@ public class LoginActivity extends AppCompatActivity {
         long frequency= 1000 * 60 * 5; //TEST:5 minutes // 1000 * 60 * 60 * 24 * 7; // week in milliseconds
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), frequency, pendingIntent);
 
-
+        //lets update race list
+        updateAvailableRaces();
 
         if(loggedInUser != null){
             // we are already in.
@@ -144,6 +146,62 @@ public class LoginActivity extends AppCompatActivity {
 
 
     }
+
+
+
+    // update race list
+    public void updateAvailableRaces(){
+        String path = settings.getServerBaseUrl() + "/api/device/" + settings.getDeviceId() + "/races";
+
+        // we need to exec http request on main thred.
+        // Doing this on login is kind of exception
+        // these 2 lines allows us to do this ugly thing.
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
+        try {
+            //instantiates httpclient to make request
+            DefaultHttpClient httpclient = new DefaultHttpClient();
+
+            //url with the post data
+            HttpGet httget = new HttpGet(path);
+
+            //passes the results to a string builder/entity
+            JSONObject json = new JSONObject();
+
+            //sets a request header so the page receving the request
+            //will know what to do with it
+            httget.setHeader("Accept", "application/json");
+            httget.setHeader("Content-type", "application/json");
+
+            //Handles what is returned from the page
+            // ResponseHandler responseHandler = new BasicResponseHandler();
+            // httpclient.execute(httpost, responseHandler);
+            HttpResponse httpResponse = httpclient.execute(httget);
+            BufferedReader rd = new BufferedReader(new InputStreamReader(httpResponse.getEntity().getContent()));
+
+            StringBuffer result = new StringBuffer();
+            String line = "";
+            while ((line = rd.readLine()) != null) {
+                result.append(line);
+            }
+
+            JSONObject response = new JSONObject(result.toString());
+
+            settings.setAvailableRaces(response.toString());
+
+            Log.d("PATH_ONE", response.toString());
+
+        }catch (Exception ex){
+
+            Log.e("*** ERROR ***", ex.getMessage());
+        }
+
+
+    }
+
+
+
 
     // Login
     public void doLogin(View view) {

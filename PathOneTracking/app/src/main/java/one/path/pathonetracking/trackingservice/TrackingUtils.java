@@ -2,7 +2,9 @@ package one.path.pathonetracking.trackingservice;
 
 import android.app.ActivityManager;
 import android.content.Context;
+import android.graphics.BitmapFactory;
 import android.util.Log;
+import android.widget.ImageView;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ResponseHandler;
@@ -12,7 +14,11 @@ import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import java.io.BufferedReader;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class TrackingUtils {
 
@@ -132,6 +138,30 @@ public class TrackingUtils {
         }
 
         return "--";
+    }
+
+    public static boolean loadImageFromURL(String fileUrl,
+                                    ImageView iv){
+        try {
+
+            URL myFileUrl = new URL (fileUrl);
+            HttpURLConnection conn =
+                    (HttpURLConnection) myFileUrl.openConnection();
+            conn.setDoInput(true);
+            conn.connect();
+
+            InputStream is = conn.getInputStream();
+            iv.setImageBitmap(BitmapFactory.decodeStream(is));
+
+            return true;
+
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
     }
 
 }
