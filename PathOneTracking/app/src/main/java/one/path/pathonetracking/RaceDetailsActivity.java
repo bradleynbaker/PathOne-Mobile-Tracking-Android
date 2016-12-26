@@ -7,9 +7,11 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -20,6 +22,9 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import one.path.pathonetracking.trackingservice.LocationTrackingService;
 import one.path.pathonetracking.trackingservice.SettingsManager;
@@ -50,10 +55,16 @@ public class RaceDetailsActivity extends AppCompatActivity implements OnMapReady
     String currentAccuracy;
     String driver;
 
+
+    SettingsManager settings;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_race_details);
+
+        settings = new SettingsManager(getApplicationContext());
 
         // setup broadcast manager
         bManager = LocalBroadcastManager.getInstance(this);
@@ -145,6 +156,38 @@ public class RaceDetailsActivity extends AppCompatActivity implements OnMapReady
 
         t.start();
         // ~Update Scroling text
+
+
+        // Set race image
+        int selectedRacePosition = Integer.parseInt(settings.getSelectedRace());
+        JSONArray races = null;
+        String[] raceNames = new String[0];
+        String[] raceImages = new String[0];
+
+        try {
+            JSONObject json = new JSONObject(settings.getAvailableRaces());
+
+
+            String strRaces = json.getString("data");
+            races = new JSONArray(strRaces);
+
+            raceNames= new String[races.length()];
+            raceImages= new String[races.length()];
+
+            for (int i = 0; i < races.length(); i++) {
+                raceNames[i] = races.getJSONObject(i).getString("name");
+                raceImages[i] = races.getJSONObject(i).getString("logo");
+            }
+        }catch (Exception ex){
+            Log.e("PATH_ONE", ex.getMessage(),ex);
+        }
+
+        ImageView iv = (ImageView)findViewById(R.id.imageView);
+        TrackingUtils.loadImageFromURL(raceImages[selectedRacePosition],iv);
+
+        // ~Set race image
+
+
 
     }
 
