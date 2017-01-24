@@ -66,6 +66,9 @@ public class RaceDetailsActivity extends AppCompatActivity implements OnMapReady
 
         settings = new SettingsManager(getApplicationContext());
 
+
+
+
         // setup broadcast manager
         bManager = LocalBroadcastManager.getInstance(this);
         IntentFilter intentFilter = new IntentFilter();

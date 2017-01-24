@@ -63,7 +63,7 @@ public class TrackingUtils {
         }
     }
 
-    public static String httpPostJsonData(String path, String jsonData){
+    public static String httpPostJsonData(String path, String jsonData, String token){
         String response = "";
 
         try {
@@ -82,6 +82,7 @@ public class TrackingUtils {
             //will know what to do with it
             httpost.setHeader("Accept", "application/json");
             httpost.setHeader("Content-type", "application/json");
+            httpost.setHeader("Authorization", "Bearer " + token);
 
             //Handles what is returned from the page
             ResponseHandler<String> responseHandler = new BasicResponseHandler();

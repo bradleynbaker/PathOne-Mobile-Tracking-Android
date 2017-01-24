@@ -27,7 +27,7 @@ public class HttpPostLocationTask implements Runnable {
 
             String path = settings.getServerBaseUrl() + "/api/device/" + settings.getDeviceId() + "/report";
 
-            TrackingUtils.httpPostJsonData(path, LocationVo.fromLocation(location).buildJson().toString());
+            TrackingUtils.httpPostJsonData(path, LocationVo.fromLocation(location).buildJson().toString(), settings.getJwtToken());
 
             settings.setLastLiveReport("Last Live Report: " + new SimpleDateFormat("MM/dd/yyyy hh:mm:ss").format(new Date()));
 

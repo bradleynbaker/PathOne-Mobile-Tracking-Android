@@ -30,7 +30,7 @@ public class SettingsManager {
     public static final String PATH_ONE_AVAILABLE_RACES = "PATH_ONE_AVAILABLE_RACES";
     public static final String PATH_ONE_SELECTED_RACE = "PATH_ONE_SELECTED_RACE";
 
-
+    public static final String JWT_TOKEN = "jwt_token";
 
     // defaults
     public static final int PATH_ONE_PREFERENCE_MIN_REPORT_TIMEFRAME_CEL_DEFAULT = 30;
@@ -338,6 +338,20 @@ public class SettingsManager {
         return context.getApplicationContext()
                 .getSharedPreferences(PATH_ONE_SHARED_PREFERENCES, MODE_PRIVATE)
                 .getString(PATH_ONE_SELECTED_RACE,
+                        EMPTY_DEFAULT);
+    }
+
+    public void setJwtToken(String aString){
+        (context.getApplicationContext()
+                .getSharedPreferences(PATH_ONE_SHARED_PREFERENCES, MODE_PRIVATE))
+                .edit().putString(JWT_TOKEN,
+                aString).commit();
+    }
+
+    public String getJwtToken(){
+        return context.getApplicationContext()
+                .getSharedPreferences(PATH_ONE_SHARED_PREFERENCES, MODE_PRIVATE)
+                .getString(JWT_TOKEN,
                         EMPTY_DEFAULT);
     }
 }

@@ -121,23 +121,21 @@ public class LoginActivity extends AppCompatActivity {
                 .getString(Constants.LOGGED_IN_USERNAME,null);
 
 
+        if(loggedInUser != null && !settings.getJwtToken().isEmpty()){
 
+            // Do cleanup and schedule
+            Intent anIntent = new Intent(this, DatabaseCleanService.class);
+            PendingIntent pendingIntent = PendingIntent.getService(this,  0, anIntent, 0);
+            AlarmManager alarmManager = (AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(System.currentTimeMillis());
+            calendar.add(Calendar.SECOND, 10); // first time in 10 seconds.
+            long frequency= 1000 * 60 * 5; //TEST:5 minutes // 1000 * 60 * 60 * 24 * 7; // week in milliseconds
+            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), frequency, pendingIntent);
 
+            //lets update race list
+            updateAvailableRaces();
 
-        // Do cleanup and schedule
-        Intent anIntent = new Intent(this, DatabaseCleanService.class);
-        PendingIntent pendingIntent = PendingIntent.getService(this,  0, anIntent, 0);
-        AlarmManager alarmManager = (AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.add(Calendar.SECOND, 10); // first time in 10 seconds.
-        long frequency= 1000 * 60 * 5; //TEST:5 minutes // 1000 * 60 * 60 * 24 * 7; // week in milliseconds
-        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), frequency, pendingIntent);
-
-        //lets update race list
-        updateAvailableRaces();
-
-        if(loggedInUser != null){
             // we are already in.
             Intent myIntent = new Intent(LoginActivity.this, RacePickerActivity.class);
             // myIntent.putExtra("key", value); //Optional parameters
@@ -173,6 +171,7 @@ public class LoginActivity extends AppCompatActivity {
             //will know what to do with it
             httget.setHeader("Accept", "application/json");
             httget.setHeader("Content-type", "application/json");
+            httget.setHeader("Authorization", "Bearer " + settings.getJwtToken());
 
             //Handles what is returned from the page
             // ResponseHandler responseHandler = new BasicResponseHandler();
@@ -228,8 +227,8 @@ public class LoginActivity extends AppCompatActivity {
         */
 
         // String path = "http://demo.path.one/api/device/" + settings.getDeviceId() + "/setuser";
-        String path = settings.getServerBaseUrl() + "/api/device/" + settings.getDeviceId() + "/setuser";
-
+        // String path = settings.getServerBaseUrl() + "/api/device/" + settings.getDeviceId() + "/setuser";
+        String path = settings.getServerBaseUrl() + "/api/login";
 
 
 
@@ -250,8 +249,10 @@ public class LoginActivity extends AppCompatActivity {
             JSONObject json = new JSONObject();
 
             try {
-                json.put("username", user);
+                // json.put("username", user);
+                json.put("email", user);
                 json.put("password", password);
+                json.put("deviceid", settings.getDeviceId());
 
             } catch (JSONException e) {
                 Log.e("ERROR",e.getMessage());
@@ -279,7 +280,28 @@ public class LoginActivity extends AppCompatActivity {
             }
 
             JSONObject response = new JSONObject(result.toString());
-            registeredUserName = ((JSONObject)response.getJSONObject("data")).getString("name");
+
+            // this is now deprecated!
+            // registeredUserName = ((JSONObject)response.getJSONObject("data")).getString("name");
+
+            if(response.has("token")){
+                // token exists, login was successfull
+                String token = response.getString("token");
+
+                settings.setJwtToken(token);
+                // Log.e("LOGIN", token);
+
+            }else{
+                // no token, login unsucessfull.
+                // probably we have a message
+                String message = "Login Failed";
+                if(response.has("message")){
+                    message = response.getString("message");
+                }
+                Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+
+            }
+
 
         }catch (Exception ex){
 
@@ -370,6 +392,9 @@ public class LoginActivity extends AppCompatActivity {
         editor.putString(Constants.LOGGED_IN_REGISTERED_USERNAME, registeredUserName);
         editor.commit(); // commit changes
 
+
+        // lets update races
+        this.updateAvailableRaces();
 
         Intent myIntent = new Intent(LoginActivity.this, RacePickerActivity.class);
         LoginActivity.this.startActivity(myIntent);

@@ -19,7 +19,6 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -82,6 +81,8 @@ public class LocationTrackingService extends Service implements
     @Override
     public void onCreate() {
         super.onCreate();
+
+
         // Kick off the process of building a GoogleApiClient and requesting the LocationServices
         // API.
 
@@ -106,9 +107,13 @@ public class LocationTrackingService extends Service implements
         AlarmManager alarmManager = (AlarmManager)this.getSystemService(Context.ALARM_SERVICE);
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
-        // calendar.add(Calendar.SECOND, 10); // first time
-        // long frequency= 10 * 1000; // in ms
-        long frequency = settings.getBatchUploadFrequency();
+
+        calendar.add(Calendar.SECOND, 10); // first time
+        long frequency= 10 * 1000; // in ms
+
+        // long frequency = settings.getBatchUploadFrequency(); // THIS WAS FOR DECEMBER RACE
+
+
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), frequency, pendingIntent);
     }
 

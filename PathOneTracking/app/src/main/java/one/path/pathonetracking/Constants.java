@@ -13,4 +13,6 @@ public class Constants {
     public static final String ACCURACY = "accuracy";
     public static final String SPEED = "speed";
     public static final String SAMPLE_TIMESTAMP = "sample_timestamp";
+
+
 }

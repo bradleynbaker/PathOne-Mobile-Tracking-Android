@@ -108,7 +108,7 @@ public class LocationsBatchUpdateService extends Service {
                     }
 
                     // send
-                    String strResp = TrackingUtils.httpPostJsonData(path, locationsJsonArray.toString());
+                    String strResp = TrackingUtils.httpPostJsonData(path, locationsJsonArray.toString(), settings.getJwtToken());
 
 
                     batchId = (String) new JSONObject(strResp).getJSONObject("data").get("bath_id");
